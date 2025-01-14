@@ -1,0 +1,15 @@
+body {
+    background-color: rgb(235, 208, 206);
+  }
+
+.form-label {
+    color: rgb(221, 22, 105);
+  }
+  
+#id_appareil {
+    color: rgb(10, 146, 44);
+  }
+
+  #id_appareiltype {
+    color: rgb(248, 233, 14);
+  }

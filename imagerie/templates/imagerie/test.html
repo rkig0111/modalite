@@ -1,0 +1,16 @@
+<body>
+{# Load the tag library #}
+<!-- 📝 🖍️ 🖊️  ➕  ▶️ ◀️ ❌ ✅ 🚫 -->
+<!-- 📝 🖍️ 🖊️  ➕  ▶️ ◀️ ❌ ✅ 🚫 -->
+ 
+{% load static %}
+<link rel="stylesheet" href="{% static 'imagerie/css/style.css' %}">   
+
+{# Display a form #}
+<form action="http://127.0.0.1:8000/imagerie/" method="post" class="form">
+  {% csrf_token %}
+    <button type="submit" class="btn btn-primary">
+      Submit
+    </button>
+</form>
+</body>

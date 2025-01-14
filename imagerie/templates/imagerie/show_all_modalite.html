@@ -1,0 +1,65 @@
+<body>
+<h1>Bienvenu sur Imagerie ! </h1>
+ 
+<table Border= 1px solid black;>
+    <tr>
+        <th>ID</th>
+        <th>AET</th>
+        <th>APPAREIL</th>
+        <th>APPAREILTYPE</th>
+        <th>VLAN</th> 
+        <th>ADDRIP</th>        
+        <th>PORT</th>
+        <th>MACADDR</th> 
+        <th>PACS</th>
+        <th>WORKLIST</th>
+        <th>SOFT</th>
+        <th>STORES</th>
+        <th>PRINTERS</th>
+        <th>SERVICE</th>
+        <th>LOC.</th>
+        <th colspan="2">ACTIONS</th>
+    </tr>  
+    {% for modalite in modalites %}
+        <tr>
+          <td>{{ modalite.id }}</td>
+          <td>{{ modalite.aet }}</td>
+          <td>{{ modalite.appareil }}</td>
+          <td>{{ modalite.appareiltype }}</td>
+          <td>{{ modalite.vlan }}</td>
+          <td>{{ modalite.addrip }}</td>
+          <td>{{ modalite.port }}</td>
+          <td>{{ modalite.macaddr }}</td>          
+          <td>{{ modalite.pacs }}</td>
+          <td>{{ modalite.worklist }}</td>
+          <td>
+            {% for soft in modalite.soft.all %}
+                  {{ soft.nom }}<br>
+            {% endfor %}
+            </td>
+          <td>
+          {% for store in modalite.stores.all %}
+                {{ store.aet }}<br>
+          {% endfor %}
+          </td>
+          <td>
+            {% for printer in modalite.printers.all %}
+                  {{ printer.aet }}<br>
+            {% endfor %}
+          </td>
+          <td>{{ modalite.service }}</td>
+          <td>{{ modalite.loc }}</td> 
+          <td></td>    
+          <!-- 📝 🖍️ 🖊️  ➕  ▶️ ◀️ ❌ ✅ 🚫 -->    
+        </tr>
+    {% endfor %}
+</table>
+<br>
+Ma liste : {{ maliste }}
+<br>
+<ul>
+{% for liste in maliste %}
+  <li>{{ liste }}</li><br>
+{% endfor %}
+</ul>
+</body>
