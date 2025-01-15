@@ -290,6 +290,7 @@ class Modalite(models.Model):
     Connection = models.OneToOneField('Connection', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_Connection', help_text=_(" connnectivité de la machine "))
     addrip = models.GenericIPAddressField(default="0.0.0.0", blank=True, null=True)
     hostname = models.CharField(max_length=30, blank=True, null=True) 
+    commentaire = models.CharField(max_length=255, blank=True, null=True)
     macaddr = models.CharField(max_length=20, blank=True, null=True) 
     vlan = models.ForeignKey('Vlan', null=True, blank=True, on_delete=models.PROTECT, related_name='net_vlan', help_text=_(" Vlan "), ) 
     mask = models.CharField(max_length=20, blank=True, null=True, default='255.255.255.0')
