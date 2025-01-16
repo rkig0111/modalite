@@ -63,59 +63,46 @@ class ModaliteLine(admin.StackedInline):
     model = Modalite
     extra = 0
 
-#class NetAdmin(admin.ModelAdmin):
-#    # inlines = [ModaliteLine, ServeurLine ]
-#    inlines = [ModaliteLine ]
-#    fieldsets = [
-#    ('Net Details', {'fields': [ 'addrip', 'macaddr', 'vlan', 'mask', 'gw', 'dns1', 'dns2', 'dhcp']}),
-#    #('Net Dates', {'fields': ['', '', '']}),
-#    ]
-#
-#    # addrip, hostname, macaddr, vlan, mask, gw, dns1, dns2, dhcp
-#
-#    # readonly_fields = ('datecreat',)
-#    list_display = ('addrip', 'macaddr', 'hostname','vlan')
-#    # list_editable = ('appareil',)
-#    # list_display_links = ('addrip', 'macaddr')
-#    # list_filter = ('addrip',)
-#    # search_fields = ['appareil', 'appareiltype'] 
+class TousLesServeursListFilter(admin.SimpleListFilter):
+    # Human-readable title which will be displayed in the
+    # right admin sidebar just above the filter options.
+    title = _("tous les serveurs")
 
-
-# col = [addrip, aet, port, mask, hostname, modalite, hostname, systeme, macadresse, dicom, inventaire \
-# remarque, appareil, etablissement, localisation, marque, typeappareil, vlan ]
-
-"""class VlanFilterSearchForm(admin.SimpleListFilter):
-    title = _('Vlan')
-    parameter_name = 'vlan'
-    # template = 'admin/vlan_search_filter.html'
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = "serveur"
 
     def lookups(self, request, model_admin):
-        # Get a list of vlans for the dropdown
-        vlans = [(str(vlan.id), vlan.nom) for vlan in Vlan.objects.all()]
-        # Add an option for "All" at the beginning
-        # vlans.insert(0, ('', _('All')))
-        print('vlans :  ', vlans)
-        return vlans
+        print("request : ", request)
+        print("model_admin : ", model_admin)
+        return [
+            ("SE", "INF+PACS+STORE+WL+DACS"),
+            ("IN", "INFORMATIQUE"),
+            ("PC", "ORDINATEUR"), 
+            ("NA", "N/A"),
+            ("PA", "DICOM PACS"),
+            ("WL", "DICOM WORKLIST"),
+            ("DA", "DICOM DACS"),
+            ("ST", "DICOM STORE"),
+            ("PR", "DICOM PRINT"),
+            ("OT", "DICOM OTHER"),                       
+        ]
 
     def queryset(self, request, queryset):
-        vlan_id = self.value()
-        print('vlan_id  :  ', vlan_id)
-        modalite = Modalite.objects.all()
-        if vlan_id:
-            return queryset.filter(vlan__id=vlan_id)
+        if self.value()== 'SE':
+            print("self.value() : ",  self.value())
+            return queryset.filter().exclude(serveur='PC').exclude(serveur='NA').exclude(serveur='PR').exclude(serveur='OT')
+        elif self.value() in ['IN', 'PC', 'NA', 'PA', 'WL', 'DA', 'ST', 'PR', 'OT']:            
+            return queryset.filter(serveur=self.value())
+        else:
+            return queryset
 
-    def choices(self, changelist):
-        super().choices(changelist)
-        return (
-            *self.lookup_choices,
-        )"""
 
 class ModaliteAdmin(admin.ModelAdmin):
     # list_select_related = ["net", "appareil", "appareiltype"]
 
-    list_display = ('addrip', 'aet', 'port', 'appareil', 'appareiltype', 'pacs', 'worklist', 'service', 'vlan', 'macaddr' )    
+    list_display = ('hostname', 'addrip', 'aet', 'port', 'appareil', 'appareiltype', 'pacs', 'worklist', 'service', 'vlan', 'macaddr' )    
     # list_editable = ('appareil', 'appareiltype')
-    list_filter= ('reforme', 'serveur', 'vlan' ) # , 'appareil'
+    list_filter= ['reforme', TousLesServeursListFilter ] # , 'serveur', 'vlan'  , 'appareil'
     list_display_links = (
         'aet',
         'appareil',
@@ -135,6 +122,11 @@ class ModaliteAdmin(admin.ModelAdmin):
         'macaddr',
         'vlan__nom',
     )
+
+from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
+
+
 
 """addrip, aet, appareil, appareil_id, appareiltype, appareiltype_id, dhcp, dns1, dns2, gw, hostname, id, loc, loc_id, macaddr, mask, modalite_pacs, modalite_printers, modalite_stores, modalite_worklist, pacs, pacs_id, port, printers, serveur, service, service_id, stores, vlan, vlan_id, worklist, worklist_id"""
 

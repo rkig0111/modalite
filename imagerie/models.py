@@ -101,7 +101,7 @@ class Service(models.Model):
   
     
 class Identifiant(models.Model):
-    login = models.CharField(blank=True, null=True, max_length=30) 
+    login = models.CharField(blank=True, null=True, max_length=128) 
     #password = models.CharField(blank=True, null=True, max_length=30, default="voir TeamPass") 
     divers = models.CharField(max_length=255, blank=True, null=True)
 
@@ -116,7 +116,7 @@ class Identifiant(models.Model):
 
 
 class Contact(models.Model):
-    societe =  models.CharField(blank=True, null=True, max_length=30) 
+    societe =  models.CharField(blank=True, null=True, max_length=128) 
     nom = models.CharField(blank=True, null=True, max_length=30) 
     prenom = models.CharField(max_length=30, blank=True, null=True)
     mail = models.EmailField(max_length=50, blank=True, null=True)
@@ -134,7 +134,7 @@ class Contact(models.Model):
 
 
 class Ras(models.Model):
-    denom = models.CharField(blank=True, null=True, max_length=30) 
+    denom = models.CharField(blank=True, null=True, max_length=128) 
     contact = models.ForeignKey('Contact', null=True, blank=True, on_delete=models.PROTECT, related_name='ras_contact', help_text=_(" Contact "), )
     divers = models.CharField(max_length=255, blank=True, null=True)
 
@@ -147,7 +147,7 @@ class Ras(models.Model):
 
 
 class Resspartage(models.Model):
-    nom = models.CharField(blank=True, null=True, max_length=30) 
+    nom = models.CharField(blank=True, null=True, max_length=128) 
     chemin = models.CharField(blank=True, null=True, max_length=255) 
     # projet = models.ForeignKey('Projet', null=True, blank=True, on_delete=models.PROTECT, related_name='resspartage_projet', help_text=_(" Projet "), ) 
     identifiant = models.ManyToManyField('Identifiant', blank=True, help_text=_(" Identifiant # "), ) 
@@ -163,7 +163,7 @@ class Resspartage(models.Model):
 
 
 class Bdd(models.Model):
-    nom = models.CharField(blank=True, null=True, max_length=30) 
+    nom = models.CharField(blank=True, null=True, max_length=128) 
     unc = models.CharField(blank=True, null=True, max_length=255)
     host = models.CharField(blank=True, null=True, max_length=30) 
     port = models.IntegerField(blank=True, null=True, help_text=_(" Port BDD ")) 
@@ -181,7 +181,7 @@ class Bdd(models.Model):
 
 
 class Connection(models.Model):
-    nom = models.CharField(blank=True, null=True, max_length=30) 
+    nom = models.CharField(blank=True, null=True, max_length=128) 
     ras = models.ForeignKey('Ras', null=True, blank=True, on_delete=models.PROTECT, related_name='Connection_ras', help_text=_(" compte ras_xxx "), )
     resspartage = models.ForeignKey('Resspartage', null=True, blank=True, on_delete=models.PROTECT, related_name='Connection_resspartage', help_text=_(" ressource partagée "), )
     bdd = models.ForeignKey('Bdd', null=True, blank=True, on_delete=models.PROTECT, related_name='Connection_bdd', help_text=_(" connexion à BDD "), )
@@ -246,7 +246,7 @@ class Hard(models.Model):
 
 
 class Projet(models.Model):
-    nom = models.CharField(blank=True, null=True, max_length=30) 
+    nom = models.CharField(blank=True, null=True, max_length=128) 
     demande = models.CharField(blank=True, null=True, max_length=50)
     contact = models.ForeignKey('Contact', null=True, blank=True, on_delete=models.PROTECT, related_name='projet_contact', help_text=_(" Contact "), )
     service = models.ForeignKey('Service', null=True, blank=True, on_delete=models.PROTECT, related_name='projet_service', help_text=_(" Service "), )  
