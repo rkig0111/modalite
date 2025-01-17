@@ -14,9 +14,11 @@ class Command(BaseCommand):
             if modal.ping :
                 print(modal.addrip, " déjà notée joignable ",)
             else :
-                res = ping3.ping(modal.addrip, timeout=1)
-                if res:
-                    modal.ping = True
-                    modal.save()
-                print(modal.addrip, "  ", modal.ping )
-
+                try:
+                    res = ping3.ping(modal.addrip, timeout=1)
+                    if res:
+                        modal.ping = True
+                        modal.save()
+                    print(modal.addrip, "  ", modal.ping )
+                except:
+                    print(f"---> ping problématique sur la modalité : {modal.addrip}")
