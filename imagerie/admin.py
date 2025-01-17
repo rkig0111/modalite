@@ -100,18 +100,20 @@ class TousLesServeursListFilter(admin.SimpleListFilter):
 class ModaliteAdmin(admin.ModelAdmin):
     # list_select_related = ["net", "appareil", "appareiltype"]
 
-    list_display = ('hostname', 'addrip', 'aet', 'port', 'appareil', 'appareiltype', 'pacs', 'worklist', 'service', 'vlan', 'macaddr' )    
+    list_display = ('hostname', 'colored_addrip', 'aet', 'port', 'appareil', 'appareiltype', 'pacs', 'worklist', 'service', 'vlan', 'macaddr')    
+    ordering = ('addrip',)
     # list_editable = ('appareil', 'appareiltype')
-    list_filter= ['reforme', TousLesServeursListFilter ] # , 'serveur', 'vlan'  , 'appareil'
+
+    # list_filter = [VlanFilterSearchForm, 'appareil']   # , 'net__vlan__nom'
+    list_filter= ['reforme', 'ping', TousLesServeursListFilter, 'vlan' ] # , 'serveur', 'vlan'  , 'appareil'
+    
     list_display_links = (
         'aet',
         'appareil',
         'appareiltype',
-        'addrip',
+        'colored_addrip',
     )
     autocomplete_fields = ('vlan',)
-
-    # list_filter = [VlanFilterSearchForm, 'appareil']   # , 'net__vlan__nom'
 
     search_fields = (
         'aet',
@@ -123,17 +125,25 @@ class ModaliteAdmin(admin.ModelAdmin):
         'vlan__nom',
     )
 
-from django.contrib import admin
-from django.utils.translation import gettext_lazy as _
+    """def pagar_pase(modeladmin, request, queryset):
+        'Does something with each objects selected '
+        selected_objects = queryset.all()
+        
+        for i in selected_objects:
+            # return '''<form action="." method="post">Action</form> '''
+            print(i.addrip)
+            # do something with i
+
+    pagar_pase.short_description = "Testing form output"
+    pagar_pase.allow_tags = True
+
+    actions = ["pagar_pase"]"""
 
 
-
-"""addrip, aet, appareil, appareil_id, appareiltype, appareiltype_id, dhcp, dns1, dns2, gw, hostname, id, loc, loc_id, macaddr, mask, modalite_pacs, modalite_printers, modalite_stores, modalite_worklist, pacs, pacs_id, port, printers, serveur, service, service_id, stores, vlan, vlan_id, worklist, worklist_id"""
 
 
 # class TestlanAdmin(admin.ModelAdmin):
 #     list_display = ('modalite',)
-
 
 # admin.site.register(MUser, UserAdmin)
 admin.site.register(Appareil, AppareilAdmin)

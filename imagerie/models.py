@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models import UniqueConstraint
 from datetime import timedelta
 from django.utils import timezone
+from django.utils.html import format_html
 
 # class MUser(AbstractUser):
 #     is_premium = models.BooleanField(default=False)
@@ -311,6 +312,7 @@ class Modalite(models.Model):
     service  = models.ForeignKey('Service', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_service', help_text=_(" Service ") )
     loc = models.ForeignKey('Localisation', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_loc',help_text=_(" Localisation ") )
     reforme = models.BooleanField(default=False, help_text=(" réformé ? "))
+    ping = models.BooleanField(default=False, help_text=(" joignable par ping ? "))
     
     class Meta:
         constraints = [
@@ -323,6 +325,15 @@ class Modalite(models.Model):
     def __str__(self):
         return "{0}".format(self.aet)
 
+    def colored_addrip(self):
+        if self.ping is False:
+                color = "red"
+        else:
+                color = "green"
+        return format_html("<span style=color:%s>%s</span>" % (color, self.addrip))
+
+
+    colored_addrip.allow_tags = True
 
 # class Testlan(models.Model):
 #     modalite = models.OneToOneField(Modalite, on_delete=models.CASCADE, primary_key=True,)

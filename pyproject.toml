@@ -10,6 +10,7 @@ python = "^3.10"
 django-extensions = "^3.2.3"
 mysqlclient = "^2.2.5"
 django-debug-toolbar = "^4.4.6"
+ping3 = "^4.0.8"
 
 [tool.poetry.group.dev.dependencies]
 Django = "^5.1.2"
