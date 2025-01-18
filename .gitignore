@@ -65,6 +65,7 @@ db.sqlite3
 db.sqlite3-journal
 private/
 .vscode/
+install_modalite.txt
 
 # Flask stuff:
 instance/

@@ -313,7 +313,9 @@ class Modalite(models.Model):
     loc = models.ForeignKey('Localisation', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_loc',help_text=_(" Localisation ") )
     reforme = models.BooleanField(default=False, help_text=(" réformé ? "))
     ping = models.BooleanField(default=False, help_text=(" joignable par ping ? "))
-    
+    recent_ping = models.DateTimeField(null=True, blank=True)
+    first_ping = models.DateTimeField(null=True, blank=True)
+
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['addrip', 'aet', 'port'], name='unique_dicom') # trio DICOM !

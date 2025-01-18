@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
-import subprocess
 from imagerie.models import Modalite
+from django.utils import timezone
 
 class Command(BaseCommand):
     args = ''
@@ -9,16 +9,30 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # start_response('200 OK', [('Content-Type', 'text/plain')])
         import ping3
-        modalites = Modalite.objects.all().order_by('addrip')
+        # modalites = Modalite.objects.filter(addrip__startswith="10.208.37.15").order_by('addrip')
+        modalites = Modalite.objects.all()  # .order_by('addrip')
+        count = 0
         for modal in modalites:
-            if modal.ping :
-                print(modal.addrip, " déjà notée joignable ",)
-            else :
-                try:
-                    res = ping3.ping(modal.addrip, timeout=1)
-                    if res:
-                        modal.ping = True
-                        modal.save()
-                    print(modal.addrip, "  ", modal.ping )
-                except:
-                    print(f"---> ping problématique sur la modalité : {modal.addrip}")
+            count += 1
+            try:
+                res = ping3.ping(modal.addrip, timeout=1)
+                # print("res = ", res, "   modal.ping = ", modal.ping)
+                if res and (modal.ping == True) :                    
+                    modal.recent_ping = timezone.now()
+                    print(f"---> {count} la modalité {modal.addrip} répond au ping et a déjà répondu au ping                                ", end="\x0d")
+                elif res and  (modal.ping == False):
+                    modal.ping = True
+                    modal.first_ping = timezone.now()
+                    print(f"---> {count} la modalité {modal.addrip} répond pour la première fois au ping                                    ")
+                elif (res == None) and (modal.ping == True) :
+                    print(f"---> {count} la modalité {modal.addrip} a déjà répondu pas au ping mais à l' air : éteinte? réformée? en panne? ")
+                    pass
+                elif (res == None)and (modal.ping == False) :
+                    print(f"---> {count} la modalité {modal.addrip} n'a pour l'instant, jamais répondu au ping                              ", end="\x0d")
+                    pass
+                modal.save()
+            except:
+                print(f"---> {count} la modalité {modal.addrip} a un problème d' accès !                                                ")
+        print()        
+            
+  

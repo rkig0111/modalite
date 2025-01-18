@@ -4,6 +4,9 @@ from django.contrib.auth.admin import UserAdmin
 from imagerie.models import Appareil, Marque, Appareiltype, Vlan, Etablissement, Service, Connection  # , Testlan
 from imagerie.models import Modalite, Localisation, Contact, Soft, Bdd, Ras, Resspartage, Identifiant, Projet, Hard
 from django.utils.translation import gettext as _
+#from django.db.models import Q
+from django.contrib import messages
+from django.utils.translation import ngettext
 
 # class MUserAdmin(UserAdmin):
 #     fieldsets = UserAdmin.fieldsets + (
@@ -72,8 +75,7 @@ class TousLesServeursListFilter(admin.SimpleListFilter):
     parameter_name = "serveur"
 
     def lookups(self, request, model_admin):
-        print("request : ", request)
-        print("model_admin : ", model_admin)
+        # print("request : ", request)
         return [
             ("SE", "INF+PACS+STORE+WL+DACS"),
             ("IN", "INFORMATIQUE"),
@@ -89,8 +91,7 @@ class TousLesServeursListFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value()== 'SE':
-            print("self.value() : ",  self.value())
-            return queryset.filter().exclude(serveur='PC').exclude(serveur='NA').exclude(serveur='PR').exclude(serveur='OT')
+            return queryset.exclude(serveur='PC').exclude(serveur='NA').exclude(serveur='PR').exclude(serveur='OT')
         elif self.value() in ['IN', 'PC', 'NA', 'PA', 'WL', 'DA', 'ST', 'PR', 'OT']:            
             return queryset.filter(serveur=self.value())
         else:
@@ -125,20 +126,19 @@ class ModaliteAdmin(admin.ModelAdmin):
         'vlan__nom',
     )
 
-    """def pagar_pase(modeladmin, request, queryset):
+    """def select_addrip(modeladmin, request, queryset):
         'Does something with each objects selected '
         selected_objects = queryset.all()
         
         for i in selected_objects:
             # return '''<form action="." method="post">Action</form> '''
             print(i.addrip)
-            # do something with i
+            # messages.add_message(request, messages.INFO, "Test PING.")
 
-    pagar_pase.short_description = "Testing form output"
-    pagar_pase.allow_tags = True
+    select_addrip.short_description = "TEST PING"
+    select_addrip.allow_tags = True
 
-    actions = ["pagar_pase"]"""
-
+    actions = ["select_addrip"]"""
 
 
 
