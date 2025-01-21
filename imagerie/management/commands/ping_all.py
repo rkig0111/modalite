@@ -15,7 +15,8 @@ class Command(BaseCommand):
         modalites = Modalite.objects.all()  # .order_by('addrip')
         count = 0
         fic = Path(BASE_DIR / 'private/ping_all.txt')        
-        with open(fic, "a") as result:         
+        with open(fic, "a") as result:
+            result.write(f"{timezone.now().strftime('%m/%d/%Y, %H:%M:%S')}")      
             for modal in modalites:
                 # count += 1
                 try:
@@ -28,7 +29,7 @@ class Command(BaseCommand):
                         modal.ping = True
                         modal.first_ping = timezone.now()
                         # print(f"---> {count} la modalité {modal.addrip} répond pour la première fois au ping                                    ")
-                        result.write(f"{timezone.now()}  la modalité {modal.addrip} répond pour la première fois au ping\n")
+                        result.write(f"{timezone.now()}  la modalite {modal.addrip} repond pour la premiere fois au ping\n")
                     elif (res == None) and (modal.ping == True) :
                         # print(f"---> {count} la modalité {modal.addrip} a déjà répondu pas au ping mais à l' air : éteinte? réformée? en panne? ")
                         pass
@@ -41,6 +42,6 @@ class Command(BaseCommand):
                     # print(f"---> {count} la modalité {modal.addrip} a un problème d' accès !                                                ")
             # print() 
 
-        modal_ON = Modalite.objects.filter(ping=True).count()
-        modal_OFF = Modalite.objects.filter(ping=False).count()    
-        result.write(f"{timezone.now().strftime('%m/%d/%Y, %H:%M:%S')} --> ping machines : {modal_ON} et {modal_OFF} qui ne répondent pas !\n")
+            modal_ON = Modalite.objects.filter(ping=True).count()
+            modal_OFF = Modalite.objects.filter(ping=False).count()    
+            result.write(f" --> ping machines : {modal_ON} et {modal_OFF} qui ne repondent pas !\n")
