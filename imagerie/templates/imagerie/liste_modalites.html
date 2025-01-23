@@ -1,0 +1,14 @@
+{% extends 'imagerie/base.html' %} {% block content %} {% if modalites %}
+<ul>
+  {% for modalite in modalites %}
+  <h5>
+    <li>
+      <a href="{% url 'imagerie:detail_modalite' modalite.id %}"
+        >{{ modalite.aet }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ modalite.appareiltype }}</a>
+    </li>
+  </h5>
+  {% endfor %}
+</ul>
+{% else %}
+<p>il n'y a pas d' modalite à afficher.</p>
+{% endif %} {% endblock %}

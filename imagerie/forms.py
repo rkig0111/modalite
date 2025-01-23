@@ -9,3 +9,10 @@ class ModaliteForm(forms.ModelForm):
     class Meta:
         model = Modalite
         fields = ('aet', 'appareil', 'appareiltype', 'addrip', 'port', 'pacs', 'worklist', 'stores', 'printers', 'service', 'loc')    
+
+
+class AppareiltypeForm(forms.ModelForm):
+
+    class Meta:
+        model = Appareiltype
+        fields = ('nom', )

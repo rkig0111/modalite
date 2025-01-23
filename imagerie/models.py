@@ -61,6 +61,7 @@ class Appareiltype(models.Model):
     def __str__(self):
         return "{0}".format(self.nom)    
 
+
 class Vlan(models.Model):
     num = models.IntegerField(unique=True, blank=True, null=True)
     nom = models.CharField(max_length=45, blank=True, null=True)

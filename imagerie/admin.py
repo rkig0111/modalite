@@ -7,6 +7,10 @@ from django.utils.translation import gettext as _
 #from django.db.models import Q
 from django.contrib import messages
 from django.utils.translation import ngettext
+from django.urls import reverse
+from django.utils.safestring import mark_safe
+import logging
+logger = logging.getLogger(__name__)
 
 # class MUserAdmin(UserAdmin):
 #     fieldsets = UserAdmin.fieldsets + (
@@ -22,8 +26,11 @@ class LocalisationAdmin(admin.ModelAdmin):
 class MarqueAdmin(admin.ModelAdmin):
     list_display = ('nom',)
 
+# class AppareiltypeAdmin(admin.ModelAdmin):
+#     list_display = ('nom',)
+
 class AppareiltypeAdmin(admin.ModelAdmin):
-    list_display = ('nom',)
+    list_display = ( "nom",)    
 
 class VlanAdmin(admin.ModelAdmin):
     list_display = ('nom','num', 'divers')
@@ -90,6 +97,8 @@ class TousLesServeursListFilter(admin.SimpleListFilter):
         ]
 
     def queryset(self, request, queryset):
+        print("request : ", request)
+        print("queryset : ", queryset)
         if self.value()== 'SE':
             return queryset.exclude(serveur='PC').exclude(serveur='NA').exclude(serveur='PR').exclude(serveur='OT')
         elif self.value() in ['IN', 'PC', 'NA', 'PA', 'WL', 'DA', 'ST', 'PR', 'OT']:            
@@ -99,21 +108,23 @@ class TousLesServeursListFilter(admin.SimpleListFilter):
 
 
 class ModaliteAdmin(admin.ModelAdmin):
-    # list_select_related = ["net", "appareil", "appareiltype"]
-
-    list_display = ('hostname', 'colored_addrip', 'aet', 'port', 'appareil', 'appareiltype', 'pacs', 'worklist', 'service', 'vlan', 'macaddr')    
+    list_select_related = ["vlan", "appareil", "appareiltype", 'pacs', 'worklist', 'service']
+    # list_prefetch_related   pour les tables many to many 
+    
+    list_display = ('aet', 'hostname', 'colored_addrip', 'appareil', 'appareiltype_link', 'port', 'pacs', 'worklist', 'service', 'macaddr')   #  'vlan'
     ordering = ('addrip',)
     # list_editable = ('appareil', 'appareiltype')
 
     # list_filter = [VlanFilterSearchForm, 'appareil']   # , 'net__vlan__nom'
     list_filter= ['reforme', 'ping', TousLesServeursListFilter, 'vlan' ] # , 'serveur', 'vlan'  , 'appareil'
-    
-    list_display_links = (
+
+    """list_display_links = (
         'aet',
         'appareil',
-        'appareiltype',
+        'appareiltype', 
         'colored_addrip',
-    )
+    )"""
+
     autocomplete_fields = ('vlan',)
 
     search_fields = (
@@ -125,6 +136,17 @@ class ModaliteAdmin(admin.ModelAdmin):
         'macaddr',
         'vlan__nom',
     )
+
+    def appareiltype_link(self, obj):
+        if obj.appareiltype:
+            url = reverse("imagerie:show_appareiltype", args=[obj.appareiltype.id])
+            logger.debug(f"Generated URL: {url}")
+            link = '<a href="%s">%s</a>' % (url, obj.appareiltype.nom)
+            return mark_safe(link)    
+        return "N/A"
+
+    appareiltype_link.short_description = 'Appareiltypexxx'
+
 
     """def select_addrip(modeladmin, request, queryset):
         'Does something with each objects selected '

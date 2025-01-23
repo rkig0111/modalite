@@ -1,46 +1,40 @@
 from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.http import HttpResponse
-from .models import Modalite
+from .models import Modalite, Appareiltype
 from django.views.generic import TemplateView
 import subprocess
+from django.contrib.auth import login, logout, authenticate, get_user_model
 # from .forms import ModaliteForm
 
 counter = 0
 
-def Ping(request):
-    if request.POST:
-        subprocess.run(['./imagerie/management/commands/myscript.sh'])
+User = get_user_model()
 
-    return render(request,'imagerie/ping.html',{})
+def signup(request):
+    if request.method == "POST":
+        username = request.POST.get("username")  
+        password = request.POST.get("password")         
+        user = User.objects.create_user(username=username, password=password)
+        login(request, user)
+        return redirect('imagerie:index')
+    return render(request, 'imagerie/signup.html')  
 
-def Inc(request):
-    global counter
-    counter = counter + 1
-    return HttpResponse("The counter is now set to " + str(counter))
+def login_user(request):
+    if request.method == "POST":
+        username = request.POST.get("username")  
+        password = request.POST.get("password")
+        user = authenticate(username=username, password=password)
+        if user:
+            login(request, user)
+            return redirect('imagerie:index')
+    return render(request, 'imagerie/login.html')   
 
+def logout_user(request):
+    logout(request)
+    return redirect('imagerie:index') 
 
-def Ping2(request):
-    print("on est dans le programme Ping2")
-    if request.method == 'POST':
-        command = "./imagerie/management/commands/myscript.sh"
-        print("---->  ", command)
-        try:
-            result = subprocess.run([command], shell=True, capture_output=True, text=True)
-            print(result.stdout)
-            # process = subprocess.Popen(command, stdout=PIPE, stderr=STDOUT)
-            output = process.stdout.read()
-            exitstatus = process.poll()
-            if (exitstatus==0):
-                result = {"status": "Success", "output":str(output)}
-            else:
-                result = {"status": "Failed", "output":str(output)}
-        except Exception as e:
-            result =  {"status": "failed", "output":str(e)}
-        html = "<html><body>Script  Output: %s</body></html>" %(result)
-        # html = "<html><body>Script status: %s \n Output: %s</body></html>" %(result['status'],result['output'])
-        # return HttpResponse(html)
-        return render(request, 'imagerie/ping2.html', {} ) 
-
+def index(request):
+    return render(request,'imagerie/index.html',{})
 
 def Ping3(request):
     print("on est dans le programme Ping3")
@@ -52,38 +46,10 @@ def Ping3(request):
     return HttpResponse(html)
     # return render(request, 'imagerie/ping3.html', {} ) 
 
-
-def Ajax(request):
-    #print(request.__dict__)
-    print(request.META['REMOTE_ADDR'])
-    string = request.GET['name']
-    return HttpResponse("Bonjour %s!" % string)
-    if request.method == "POST":
-        #form = ModaliteForm(request.POST)
-        #if form.is_valid():
-        #    modalite = form.save(commit=False)
-        #    modalite.save()
-            return redirect('show_all_modalite')
-    else:
-        pass
-        #form = ModaliteForm()
-        # form =ModaliteForm()
-    #return render(request, 'imagerie/delete.html', {'form': form})
-    #print("on est dans le programme Ping3")
-    # if request.method == 'POST':
-    command = "./imagerie/management/commands/myscript.sh"
-    #print("---->  ", command)
-    result = subprocess.run([command], shell=True, capture_output=True, text=True)
-    #print(result)
-    result = ['test1', 'test2', 'test3']
-    # html = "<html><body>Script  Output: %s</body></html>" %(result)
-    return render(request, 'imagerie/ajax.html', {'result':result} ) 
-
-
 def show_all_modalite(request):
     # modalites = Modalite.objects.prefetch_related('stores').all().order_by('id').all()
     # modalites = Modalite.objects.prefetch_related('stores').all().filter(appareil__nom = 'Scanner')
-    modalites = Modalite.objects.prefetch_related('stores', 'printers', 'soft').select_related('appareil', 'appareiltype', 'vlan', 'pacs', 'worklist', 'service', 'loc').all().order_by('id')
+    modalites = Modalite.objects.prefetch_related('stores', 'printers', 'soft').select_related('appareil', 'appareiltype', 'vlan', 'pacs', 'worklist', 'service', 'loc').order_by('id')
     # print(Modalite.objects.select_related('appareil', 'appareiltype', 'vlan', 'pacs', 'worklist', 'service', 'loc').prefetch_related('stores', 'printers').all().order_by('id').query)
     # modalites = Modalite.objects.prefetch_related('stores', 'printers').all().filter(appareil__nom = 'Scanner').select_related('appareil', 'appareiltype', 'pacs', 'worklist', 'service', 'loc', 'net' )
     maliste=["test1", "test2", "test3", "test4"]
@@ -109,7 +75,17 @@ def show_all_modalite(request):
 
 def show_modalite(request, id):
     modalite = get_object_or_404(Modalite, id=id)
-    return render(request, 'imagerie/show_modalite.html', {'form': form})
+    return render(request, 'imagerie/show_modalite.html', {'modalite': modalite})
+    # return render(request, 'imagerie/show_modalite.html', {'form': form})
+    
+def detail_modalite(request, id):
+    modalite = get_object_or_404(Modalite, id=id)
+    return render(request, 'imagerie/detail_modalite.html', {'modalite': modalite})
+    
+def show_appareiltype(request, id):
+    appareiltype = get_object_or_404(Appareiltype, id=id)
+    form = Appareiltype()
+    return render(request, 'imagerie/show_appareiltype.html', {'form': form})
 
 def delete_modalite(request, id):
     modalite = get_object_or_404(Modalite, id=id)
@@ -120,8 +96,7 @@ def delete_modalite(request, id):
 
 
 def test(request):
-    modalite = Modalite.objects.get(id=106)
-    pass
+    modalites = Modalite.objects.all()
     # if request.method == "POST":
     #     form = ModaliteForm(request.POST)
     #     if form.is_valid():
@@ -131,4 +106,11 @@ def test(request):
     # else:
     #     form = ModaliteForm()
     #     # form =ModaliteForm()
-    # return render(request, 'imagerie/delete.html', {'form': form})
+    
+    return render(request, 'imagerie/liste_modalites.html', {'modalites': modalites})
+
+
+def get_message(request):
+    return render(request, 'imagerie/message.html', {'message': "Hello, HTMX!"})
+
+

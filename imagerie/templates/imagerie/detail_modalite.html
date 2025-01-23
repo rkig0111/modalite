@@ -1,0 +1,30 @@
+{% extends 'imagerie/base.html' %} {% block content %}
+
+<table>
+  <tr>
+    <td><h3>id :</h3></td>
+    <td><h3>{{ modalite.id }}</h3></td>
+  </tr>
+  <tr>
+    <td><h3>aet :</h3></td>
+    <td><h3>{{ modalite.aet }}</h3></td>
+  </tr>
+  <tr>
+    <td><h3>port :</h3></td>
+    <td><h3>{{ modalite.port }}</h3></td>
+  </tr>
+  <tr>
+    <td><h3>appareil :</h3></td>
+    <td><h3>{{ modalite.appareil }}</h3></td>
+  </tr>
+  <tr>
+    <td><h3>appareiltype :</h3></td>
+    <td><h3>{{ modalite.appareiltype }}</h3></td>
+  </tr>
+  <tr>
+    <td><h3>addrip :</h3></td>
+    <td><h3>{{ modalite.addrip }}</h3></td>
+  </tr>
+</table>
+
+{% endblock %}
