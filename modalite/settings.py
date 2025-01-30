@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-av8tgjmuk5=ehmq*qm9*euzku(@absw4*351u%x$ry^wbiei3c"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
 
 ALLOWED_HOSTS = []
 
@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "debug_toolbar",
     'django_extensions',
     "imagerie",
     "django_htmx",
@@ -45,7 +44,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    #"debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -76,51 +75,36 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "modalite.wsgi.application"
 
+try:
+    import debug_toolbar
+
+    del debug_toolbar
+    DEBUG_TOOLBAR = True
+except ImportError:
+    DEBUG_TOOLBAR = False
+
+DEBUG = False
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+    
+#            
+#  /|\      Cette déclaration est temporaire le temps d'utiliser la BDD
+# /_!_\     en developpement ET en Prod.  
+#           la base sera à terme sur Postgres et séparée de celle de développement !
 
-DATABASES = {
+DATABASES = {                     
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db2.sqlite3",
+        "NAME": "//shor/imagerie$/db2.sqlite3",
     },
-    "olddb": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": Path("/home/kligliro/repos_modalite/modalite/db.sqlite3"),
-    },
-    #"modalite": {        
-    #    "ENGINE": "django.db.backends.mysql",
-    #    "NAME": "modalite",
-    #    "USER": "kligliro",
-    #    "PASSWORD": "%LokO80%",
-    #    "PORT": 3306,
-    #},
-
-    # "modalite": {
+    # "default": {
     #     "ENGINE": "django.db.backends.sqlite3",
-    #     "NAME": BASE_DIR / "/home/kligliro/repos_modalite_bio/modalite_bio/db.sqlite3",
+    #     "NAME": BASE_DIR / "db2.sqlite3",
     # },
-    # "modalmysql": {
-    #     "ENGINE": "django.db.backends.mysql",
-    #     'OPTIONS': {
-    #     	'read_default_file': BASE_DIR / 'repos_modalite/my.cnf',
-    # 	}, 
-    # },
-    #"mymodal": {
-    #    "NAME": "modalite",
-    #    "ENGINE": "django.db.backends.mysql",
-    #    "USER": "kligliro",
-    #    "PASSWORD": "%LokO80%",
-    #},
-    # "modalmysql": {
-    #     "ENGINE": "django.db.backends.mysql",
-    #     'NAME': "modalite",  
-    #     'USER': "kligliro",  
-    #     'PASSWORD': "%LokO80%",  
-    #     # 'HOST': "172.19.23.10",
-    #     'HOST': "127.0.0.1",
-    #     'PORT': "3306",  
+    # "olddb": {
+    #     "ENGINE": "django.db.backends.sqlite3",
+    #     "NAME": Path("/home/kligliro/repos_modalite/modalite/db.sqlite3"),
     # },
 }
 
@@ -184,28 +168,18 @@ MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
 
 
-# o.dhcp=0 if o.dhcp else 1
 
-"""
-OLD : Modalite :         OLD : Net :        OLD : Vlan :        NEW : Modalite :
-id                      id                  id                  id
-aet                     addrip              num                 aet
-port                    hostname            nom                 port
-pacs_id                 macaddr             divers              service_id
-service_id              mask                                    appareil_id                            
-worklist_id             gw                                      appareiltype_id
-appareil_id             dns1                                    loc_id
-appareiltype_id         dns2                                    addrip
-loc_id                  dhcp                                    dhcp
-net_id                  vlan_id                                 dns1
-                                                                dns2
-                                                                gw
-                                                                hostname
-                                                                macaddr
-                                                                mask
-                                                                vlan_id
-                                                                serveur
-                                                                pacs_id
-                                                                worklist_id
-"""
+# Do not modify code below, please !
 
+# This will import specific settings for production, testing environment, development...
+
+
+file = Path("instance_settings.py")
+if file.exists():
+    from instance_settings import * 
+else:
+    print("No site/environment configuration found.")
+
+print("DATABASES prisent en charge : ", DATABASES)
+
+print("DEBUG : ", DEBUG)
