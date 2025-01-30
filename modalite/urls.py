@@ -10,8 +10,7 @@ from imagerie import views
 app_name = 'modalite'
 
 urlpatterns = [
-    # path("", include('imagerie.urls') ),
-    path("", RedirectView.as_view(url='admin/') ),
+    path("", include('imagerie.urls') ),
     path("admin/", admin.site.urls),
     path('signup', views.signup, name="signup"),
     path('login', views.login_user, name="login"),

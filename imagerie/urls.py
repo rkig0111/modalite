@@ -1,12 +1,14 @@
 from django.contrib import admin
+from django.views.generic import RedirectView
 from django.urls import path
 from . import views 
 # from .views import PingView
 
 app_name = 'imagerie'
 
-urlpatterns = [
-    path("", views.index, name='index' ),
+urlpatterns = [    
+    path("", RedirectView.as_view(url='admin/') ),
+    path("index", views.index, name='index' ),
     path("all", views.show_all_modalite , name='show_all_modalite' ),
     path("show/<int:id>/", views.show_modalite , name='show_modalite' ),
     path("detail_modalite/<int:id>/", views.detail_modalite , name='detail_modalite' ),
