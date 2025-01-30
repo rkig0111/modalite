@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.shortcuts import redirect
+from django.views.generic import RedirectView
 from debug_toolbar.toolbar import debug_toolbar_urls
 from django.conf.urls.static import static
 from django.conf import settings
@@ -8,7 +10,8 @@ from imagerie import views
 app_name = 'modalite'
 
 urlpatterns = [
-    path("", include('imagerie.urls') ),
+    # path("", include('imagerie.urls') ),
+    path("", RedirectView.as_view(url='admin/') ),
     path("admin/", admin.site.urls),
     path('signup', views.signup, name="signup"),
     path('login', views.login_user, name="login"),
