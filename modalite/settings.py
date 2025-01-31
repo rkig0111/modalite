@@ -182,4 +182,4 @@ else:
 
 print("DATABASES prisent en charge : ", DATABASES)
 
-print("DEBUG : ", DEBUG)
+# print("DEBUG : ", DEBUG)

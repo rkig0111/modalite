@@ -8,6 +8,7 @@ from django.utils.translation import gettext as _
 from django.contrib import messages
 from django.utils.translation import ngettext
 from django.urls import reverse
+from django.http import HttpResponseRedirect
 from django.utils.safestring import mark_safe
 import logging
 logger = logging.getLogger(__name__)
@@ -97,8 +98,8 @@ class TousLesServeursListFilter(admin.SimpleListFilter):
         ]
 
     def queryset(self, request, queryset):
-        print("request : ", request)
-        print("queryset : ", queryset)
+        # print("request : ", request)
+        # print("queryset : ", queryset)
         if self.value()== 'SE':
             return queryset.exclude(serveur='PC').exclude(serveur='NA').exclude(serveur='PR').exclude(serveur='OT')
         elif self.value() in ['IN', 'PC', 'NA', 'PA', 'WL', 'DA', 'ST', 'PR', 'OT']:            
@@ -111,7 +112,7 @@ class ModaliteAdmin(admin.ModelAdmin):
     list_select_related = ["vlan", "appareil", "appareiltype", 'pacs', 'worklist', 'service']
     # list_prefetch_related   pour les tables many to many 
     
-    list_display = ('aet', 'hostname', 'colored_addrip', 'appareil', 'appareiltype_link', 'port', 'pacs', 'worklist', 'service', 'macaddr')   #  'vlan'
+    list_display = ('aet', 'hostname', 'colored_addrip', 'appareil_link', 'appareiltype_link', 'port', 'pacs', 'worklist', 'service', 'macaddr')   #  'vlan'
     ordering = ('addrip',)
     # list_editable = ('appareil', 'appareiltype')
 
@@ -139,14 +140,24 @@ class ModaliteAdmin(admin.ModelAdmin):
 
     def appareiltype_link(self, obj):
         if obj.appareiltype:
-            url = reverse("imagerie:show_appareiltype", args=[obj.appareiltype.id])
-            logger.debug(f"Generated URL: {url}")
+            url = reverse('admin:imagerie_appareiltype_change', args=[obj.appareiltype.id])           
             link = '<a href="%s">%s</a>' % (url, obj.appareiltype.nom)
-            return mark_safe(link)    
+            # print("url ----> ", url)
+            return mark_safe(link)
         return "N/A"
 
-    appareiltype_link.short_description = 'Appareiltypexxx'
+    appareiltype_link.short_description = 'Appareiltype'
 
+
+    def appareil_link(self, obj):
+        if obj.appareil:
+            url = reverse('admin:imagerie_appareil_change', args=[obj.appareil.id])          
+            link = '<a href="%s">%s</a>' % (url, obj.appareil.nom)
+            # print("url ----> ", url)
+            return mark_safe(link)
+        return "N/A"
+
+    appareil_link.short_description = 'Appareil'
 
     """def select_addrip(modeladmin, request, queryset):
         'Does something with each objects selected '
