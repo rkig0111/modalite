@@ -4,6 +4,8 @@ from .models import Modalite, Appareiltype
 from django.views.generic import TemplateView
 import subprocess
 from django.contrib.auth import login, logout, authenticate, get_user_model
+from django.utils.html import format_html
+from django.contrib import messages
 # from .forms import ModaliteForm
 
 counter = 0
@@ -45,6 +47,33 @@ def Ping3(request):
     html = "<html><body>Script  Output: %s</body></html>" %(result)
     return HttpResponse(html)
     # return render(request, 'imagerie/ping3.html', {} ) 
+
+def pingip(request, ip):
+    import ping3
+    # print("ip ----> ", ip)    
+    try:
+        res = ping3.ping(ip, timeout=1)
+        print(f"{ip}  ---->  {res} sec.                          ", flush=True, end="\r")
+        if res:
+            color = "color:#00FF00;"
+            mesg = "ping OK"
+            messages.success(request, 'ping OK !')
+        else:
+            color = "color:#FF0000;"
+            mesg = "ping KO"
+            messages.warning(request, 'ping KO !')
+    except: 
+        color = "color:#0000FF;"
+        mesg = "Network is unreachable"
+        messages.error(request, 'Network is unreachable !')
+    messageping = format_html("<a style=%s>%s</a>" % (color, mesg ))
+    # return render(request, 'imagerie/pingip.html', {'messageping': messageping, 'ip':ip, 'messages':[messages,]} ) 
+    # return redirect('admin:imagerie_modalite_show')
+    # return redirect("http://127.0.0.1:8000/admin/imagerie/modalite/")
+    return redirect('/admin/imagerie/modalite/')
+    # from django.utils.http import is_safe_url
+    # is_safe_url('/admin/imagerie/modalite/')
+    # print(" is_safe_url('/admin/imagerie/modalite/' : ", is_safe_url('/admin/imagerie/modalite/'))
 
 def show_all_modalite(request):
     # modalites = Modalite.objects.prefetch_related('stores').all().order_by('id').all()

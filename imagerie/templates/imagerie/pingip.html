@@ -1,0 +1,23 @@
+{% extends 'imagerie/base.html' %}
+{% block title %} Imagerie {% endblock %}
+{% block content %}
+<h4>Modalités : {{ ip }}</h4>
+<h1>{{ messageping }} </h1>
+<!-- </h1><script>alert("{{ messageping }}")</script> </h1> -->
+{% if listemsgping %}
+<table Border= 1px solid black;>
+    <tr>
+        <th>ADDRIP</th>
+        <th>AET</th>
+        <th>HOSTNAME</th>
+        {% for msgping in listemsgping %}
+                <tr>
+                    {% for data in msgping %}    
+                        <td>{{ data }}</td>
+                    {% endfor %}
+                </tr>   
+        {% endfor %}
+        </tr>
+{% endif %}
+{% endblock %}
+</html>

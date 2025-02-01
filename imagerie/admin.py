@@ -10,6 +10,9 @@ from django.utils.translation import ngettext
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.utils.safestring import mark_safe
+from django.shortcuts import render, redirect
+from django.utils.html import format_html
+import ping3
 import logging
 logger = logging.getLogger(__name__)
 
@@ -112,7 +115,8 @@ class ModaliteAdmin(admin.ModelAdmin):
     list_select_related = ["vlan", "appareil", "appareiltype", 'pacs', 'worklist', 'service']
     # list_prefetch_related   pour les tables many to many 
     
-    list_display = ('aet', 'hostname', 'colored_addrip', 'appareil_link', 'appareiltype_link', 'port', 'pacs', 'worklist', 'service', 'macaddr')   #  'vlan'
+    # list_display = ('aet', 'hostname', 'colored_addrip', 'appareil_link', 'appareiltype_link', 'port', 'pacs', 'worklist', 'service', 'macaddr')   #  'vlan'
+    list_display = ('aet', 'hostname', 'colored_addrip', 'appareil', 'appareiltype', 'port', 'pacs', 'worklist', 'service', 'macaddr')
     ordering = ('addrip',)
     # list_editable = ('appareil', 'appareiltype')
 
@@ -138,7 +142,7 @@ class ModaliteAdmin(admin.ModelAdmin):
         'vlan__nom',
     )
 
-    def appareiltype_link(self, obj):
+    """def appareiltype_link(self, obj):
         if obj.appareiltype:
             url = reverse('admin:imagerie_appareiltype_change', args=[obj.appareiltype.id])           
             link = '<a href="%s">%s</a>' % (url, obj.appareiltype.nom)
@@ -157,21 +161,52 @@ class ModaliteAdmin(admin.ModelAdmin):
             return mark_safe(link)
         return "N/A"
 
-    appareil_link.short_description = 'Appareil'
+    appareil_link.short_description = 'Appareil'"""
 
-    """def select_addrip(modeladmin, request, queryset):
+    def select_addrip(modeladmin, request, queryset):
         'Does something with each objects selected '
         selected_objects = queryset.all()
-        
+        listip = []
         for i in selected_objects:
-            # return '''<form action="." method="post">Action</form> '''
-            print(i.addrip)
-            # messages.add_message(request, messages.INFO, "Test PING.")
+            listip.append((i.addrip, i.aet, i.hostname))
+        setlistip = set(listip)
+        print("setlistip : ", setlistip)
+        listemsgping = []
+        for modal in setlistip: 
+            msgping = []
+            ip = modal[0] if modal[0] else '---'
+            aet = modal[1] if modal[1] else '---'
+            hostname = modal[2] if modal[2] else '---'
+            try:
+                res = ping3.ping(ip, timeout=1)
+                print(f"{ip}  ---->  {res} sec.                          ", flush=True, end="\r")
+                if res:
+                    color = "color:#00FF00;"
+                    mesg = "ping OK"
+            #         messages.success(request, 'ping OK !')
+                else:
+                    color = "color:#FF0000;"
+                    mesg = "ping KO"
+            #         messages.warning(request, 'ping KO !')
+            except: 
+                color = "color:#0000FF;"
+                mesg = "Network is unreachable"
+            #     messages.error(request, 'Network is unreachable !')
+            msgeip = format_html(f"<a style={color}>{ip}</a>" )
+            msgeaet = format_html(f"<a style={color}>{aet}</a>" )
+            msgehost = format_html(f"<a style={color}>{hostname}</a>" )
+            msgping.append(msgeip)
+            msgping.append(msgeaet)
+            msgping.append(msgehost)
+            listemsgping.append(msgping)
+            
+        # print("listemesgping : ", listemsgping)
+        return render(request, 'imagerie/pingip.html', {'listemsgping': listemsgping } )         
 
-    select_addrip.short_description = "TEST PING"
+    select_addrip.short_description = "TESTS PING"
     select_addrip.allow_tags = True
 
-    actions = ["select_addrip"]"""
+    actions = ["select_addrip"]
 
 
 

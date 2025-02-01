@@ -329,12 +329,18 @@ class Modalite(models.Model):
         return "{0}".format(self.aet)
 
     def colored_addrip(self):
+        # url ='/admin/imagerie/modalite/{}/change/'.format(self.id)
+        url ='/{}/'.format(self.addrip)
         if self.ping is False:
                 color = "red"
+                color = "color:#FF0000;"
         else:
                 color = "green"
-        return format_html("<span style=color:%s>%s</span>" % (color, self.addrip))
-
+                color = "color:#00FF00;"
+        # return format_html("<span style=color:%s>%s</span>" % (color, self.addrip))
+        return format_html("<a href=%s style=%s>%s</a>" % (url, color, self.addrip ))
+        # return format_html('<span style=color:%s><a href="%s</a></span>' % (color, self.addrip, self.addrip))
+                                    
 
     colored_addrip.allow_tags = True
 

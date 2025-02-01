@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-av8tgjmuk5=ehmq*qm9*euzku(@absw4*351u%x$ry^wbiei3c"
+# SECRET_KEY = "django-insecure-av8tgjmuk5=ehmq*qm9*euzku(@absw4*351u%x$ry^wbiei3c"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
@@ -92,6 +92,8 @@ DEBUG = False
 #  /|\      Cette déclaration est temporaire le temps d'utiliser la BDD
 # /_!_\     en developpement ET en Prod.  
 #           la base sera à terme sur Postgres et séparée de celle de développement !
+#           le SECRET_KEY  sera aussi à définir ! pour l' instant il y a celle de 
+#           développement qui est dans le fichier instance_settings.py non publiée.
 
 DATABASES = {                     
     "default": {
