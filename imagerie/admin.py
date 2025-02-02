@@ -170,9 +170,10 @@ class ModaliteAdmin(admin.ModelAdmin):
         for i in selected_objects:
             listip.append((i.addrip, i.aet, i.hostname))
         setlistip = set(listip)
+        setlistipsorted = sorted(setlistip)
         print("setlistip : ", setlistip)
         listemsgping = []
-        for modal in setlistip: 
+        for modal in setlistipsorted: 
             msgping = []
             ip = modal[0] if modal[0] else '---'
             aet = modal[1] if modal[1] else '---'
