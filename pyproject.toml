@@ -13,7 +13,6 @@ django-debug-toolbar = "^4.4.6"
 ping3 = "^4.0.8"
 django-htmx = "^1.21.0"
 aioping = "^0.4.0"
-numpy = "^2.2.2"
 
 [tool.poetry.group.dev.dependencies]
 Django = "^5.1.2"
