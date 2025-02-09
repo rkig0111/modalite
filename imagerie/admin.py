@@ -241,12 +241,13 @@ class ModaliteAdmin(admin.ModelAdmin):
                 if listepingsorted[cpt][0] == True:
                     color = "color:#00FF00;"
                     mesg = "ping OK"
-                elif listepingsorted[cpt][0] == False:
-                    color = "color:#FF0000;"
-                    mesg = "ping KO"
-                else:
-                    color = "color:#0000FF;"
-                    mesg = "Network is unreachable"
+                else :
+                    if "timed out" in listepingsorted[cpt][2]:
+                        color = "color:#FF0000;"
+                        mesg = "ping KO"
+                    else :
+                        color = "color:#0000FF;"
+                        mesg = "Network is unreachable"
             else:
                 print("les listes ne correspondent pas")
             cpt += 1

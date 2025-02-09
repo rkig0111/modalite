@@ -13,6 +13,8 @@ async def ping_host(host, taskQueue, resultsQueue, timeout, retry):
                 await resultsQueue.put([True, host, delay])
             except: await resultsQueue.put([False, host, f"{host} timed out (retried)."])
         else: await resultsQueue.put([False, host, f"{host} timed out."])
+    except OSError : 
+        await resultsQueue.put([False, host, f"{host} réseau non joignable."])      
     taskQueue.task_done()
     taskQueue.get_nowait()
 
