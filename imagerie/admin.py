@@ -14,6 +14,9 @@ from django.shortcuts import render, redirect
 from django.utils.html import format_html
 import ping3
 import logging
+import imagerie.adminextra as admx 
+from asyncio import run
+
 logger = logging.getLogger(__name__)
 
 # class MUserAdmin(UserAdmin):
@@ -86,7 +89,6 @@ class TousLesServeursListFilter(admin.SimpleListFilter):
     parameter_name = "serveur"
 
     def lookups(self, request, model_admin):
-        # print("request : ", request)
         return [
             ("SE", "INF+PACS+STORE+WL+DACS"),
             ("IN", "INFORMATIQUE"),
@@ -101,8 +103,6 @@ class TousLesServeursListFilter(admin.SimpleListFilter):
         ]
 
     def queryset(self, request, queryset):
-        # print("request : ", request)
-        # print("queryset : ", queryset)
         if self.value()== 'SE':
             return queryset.exclude(serveur='PC').exclude(serveur='NA').exclude(serveur='PR').exclude(serveur='OT')
         elif self.value() in ['IN', 'PC', 'NA', 'PA', 'WL', 'DA', 'ST', 'PR', 'OT']:            
@@ -116,7 +116,7 @@ class ModaliteAdmin(admin.ModelAdmin):
     # list_prefetch_related   pour les tables many to many 
     
     # list_display = ('aet', 'hostname', 'colored_addrip', 'appareil_link', 'appareiltype_link', 'port', 'pacs', 'worklist', 'service', 'macaddr')   #  'vlan'
-    list_display = ('aet', 'hostname', 'colored_addrip', 'appareil', 'appareiltype', 'port', 'pacs', 'worklist', 'service', 'macaddr')
+    list_display = ('aet', 'hostname', 'colored_addrip', 'vlan', 'appareil', 'appareiltype', 'port', 'pacs', 'worklist', 'service', 'macaddr')
     ordering = ('addrip',)
     # list_editable = ('appareil', 'appareiltype')
 
@@ -129,6 +129,8 @@ class ModaliteAdmin(admin.ModelAdmin):
         'appareiltype', 
         'colored_addrip',
     )"""
+
+    list_per_page = 30
 
     autocomplete_fields = ('vlan',)
 
@@ -168,12 +170,10 @@ class ModaliteAdmin(admin.ModelAdmin):
         selected_objects = queryset.all()
         listip = []
         for i in selected_objects:
-            listip.append((i.addrip, i.aet, i.hostname))
-        setlistip = set(listip)
-        setlistipsorted = sorted(setlistip)
-        print("setlistip : ", setlistip)
+            listip.append([i.addrip, i.aet, i.hostname])
+        print("listip : ", listip)
         listemsgping = []
-        for modal in setlistipsorted: 
+        for modal in listip:     
             msgping = []
             ip = modal[0] if modal[0] else '---'
             aet = modal[1] if modal[1] else '---'
@@ -209,6 +209,61 @@ class ModaliteAdmin(admin.ModelAdmin):
 
     actions = ["select_addrip"]
 
+    # admin.site.disable_action("delete_selected")   # si l' on veut désactiver cette fonction sommme toute risquée
+
+
+    def select_addrip_fast(modeladmin, request, queryset):
+        """
+            pour chaque IP transmisent par la liste  <listeip> :       ["IP", "aet", "host"]
+            listeip = [['0.0.0.9', 'AET1', 'HOST1'], ['1.1.1.1', 'AET2', 'HOST2'], ['1.1.1.2', '', ''], ['1.1.1.3', 'AET3', 'HOST3'], [...]]
+
+            on récupère la liste de même taille  <listepingsorted> :   ["etat du ping", "IP", "delai ou timeout"]
+            listepingsorted = [[False, '0.0.0.9', '0.0.0.9 timed out.'], [True, '1.1.1.1', 0.00758], [True, '1.1.1.2', 0.00657], [True, '1.1.1.3', 0.00647], [...]]
+
+            il suffit de relier les 2 listes par la colonne IP commune pour récupérer les infos concernat l' aet et le host.
+        """
+        from operator import itemgetter
+        selected_objects = queryset.all()
+        listip = []
+        listemsgping = []
+        for i in selected_objects:
+            listip.append([i.addrip, i.aet, i.hostname]) 
+        listeping = run(admx.main(listip))
+        listepingsorted = sorted(listeping, key=itemgetter(1))
+        cpt = 0                                  # index pour la liste 'listepingsorted'
+        for modal in listip:     
+            msgping = []
+            ip = modal[0] if modal[0] else '---'
+            aet = modal[1] if modal[1] else '---'
+            hostname = modal[2] if modal[2] else '---'
+
+            if ip == listepingsorted[cpt][1] :   # si les adresses IP correspondent, on peut continuer le traitement
+                if listepingsorted[cpt][0] == True:
+                    color = "color:#00FF00;"
+                    mesg = "ping OK"
+                elif listepingsorted[cpt][0] == False:
+                    color = "color:#FF0000;"
+                    mesg = "ping KO"
+                else:
+                    color = "color:#0000FF;"
+                    mesg = "Network is unreachable"
+            else:
+                print("les listes ne correspondent pas")
+            cpt += 1
+            msgeip = format_html(f"<a style={color}>{ip}</a>" )
+            msgeaet = format_html(f"<a style={color}>{aet}</a>" )
+            msgehost = format_html(f"<a style={color}>{hostname}</a>" )
+            msgping.append(msgeip)
+            msgping.append(msgeaet)
+            msgping.append(msgehost)
+            listemsgping.append(msgping)
+
+        return render(request, 'imagerie/pingip.html', {'listemsgping': listemsgping } ) 
+
+    select_addrip_fast.short_description = "FAST TESTS PING"
+    select_addrip_fast.allow_tags = True
+
+    actions += ["select_addrip_fast"]
 
 
 # class TestlanAdmin(admin.ModelAdmin):
