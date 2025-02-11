@@ -8,7 +8,7 @@ from django.utils.translation import gettext as _
 from django.contrib import messages
 from django.utils.translation import ngettext
 from django.urls import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.safestring import mark_safe
 from django.shortcuts import render, redirect
 from django.utils.html import format_html
@@ -16,6 +16,7 @@ import ping3
 import logging
 import imagerie.adminextra as admx 
 from asyncio import run
+import csv
 
 logger = logging.getLogger(__name__)
 
@@ -38,10 +39,6 @@ class MarqueAdmin(admin.ModelAdmin):
 
 class AppareiltypeAdmin(admin.ModelAdmin):
     list_display = ( "nom",)    
-
-class VlanAdmin(admin.ModelAdmin):
-    list_display = ('nom','num', 'divers')
-    search_fields = ('nom', 'num')
 
 class EtablissementAdmin(admin.ModelAdmin):
     list_display = ('nom',)
@@ -111,7 +108,22 @@ class TousLesServeursListFilter(admin.SimpleListFilter):
             return queryset
 
 
-class ModaliteAdmin(admin.ModelAdmin):
+class ExportCsvMixin:
+    def export_as_csv(self, request, queryset):
+        meta = self.model._meta
+        field_names = [field.name for field in meta.fields]
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename={}.csv'.format(meta)
+        writer = csv.writer(response)
+        writer.writerow(field_names)
+        for obj in queryset:
+            row = writer.writerow([getattr(obj, field) for field in field_names])
+        return response
+
+    export_as_csv.short_description = "Export Selected"
+    
+
+class ModaliteAdmin(admin.ModelAdmin, ExportCsvMixin):
     list_select_related = ["vlan", "appareil", "appareiltype", 'pacs', 'worklist', 'service']
     # list_prefetch_related   pour les tables many to many 
     
@@ -165,6 +177,8 @@ class ModaliteAdmin(admin.ModelAdmin):
 
     appareil_link.short_description = 'Appareil'"""
 
+    actions = ["export_as_csv"]
+
     def select_addrip(modeladmin, request, queryset):
         'Does something with each objects selected '
         selected_objects = queryset.all()
@@ -207,7 +221,7 @@ class ModaliteAdmin(admin.ModelAdmin):
     select_addrip.short_description = "TESTS PING"
     select_addrip.allow_tags = True
 
-    actions = ["select_addrip"]
+    actions += ["select_addrip"]
 
     # admin.site.disable_action("delete_selected")   # si l' on veut désactiver cette fonction sommme toute risquée
 
@@ -265,6 +279,11 @@ class ModaliteAdmin(admin.ModelAdmin):
     select_addrip_fast.allow_tags = True
 
     actions += ["select_addrip_fast"]
+
+class VlanAdmin(admin.ModelAdmin, ExportCsvMixin):
+    list_display = ('nom','num', 'divers')
+    search_fields = ('nom', 'num')
+    actions = ["export_as_csv"]
 
 
 # class TestlanAdmin(admin.ModelAdmin):
