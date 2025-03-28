@@ -13,6 +13,11 @@ django-debug-toolbar = "^4.4.6"
 ping3 = "^4.0.8"
 django-htmx = "^1.21.0"
 aioping = "^0.4.0"
+djangorestframework = "^3.15.2"
+markdown = "^3.7"
+django-filter = "^25.1"
+django-cors-headers = "^4.7.0"
+requests = "^2.32.3"
 
 [tool.poetry.group.dev.dependencies]
 Django = "^5.1.2"
