@@ -17,8 +17,14 @@ import logging
 import imagerie.adminextra as admx 
 from asyncio import run
 import csv
+import subprocess
 
-logger = logging.getLogger(__name__)
+from pynetdicom import AE, evt, debug_logger
+from pynetdicom.sop_class import Verification
+
+# from modalite.settings import logger
+
+# logger = logging.getLogger(__name__)
 
 # class MUserAdmin(UserAdmin):
 #     fieldsets = UserAdmin.fieldsets + (
@@ -120,7 +126,7 @@ class ExportCsvMixin:
             row = writer.writerow([getattr(obj, field) for field in field_names])
         return response
 
-    export_as_csv.short_description = "Export Selected"
+    export_as_csv.short_description = "Export Selected as CSV"
     
 
 class ModaliteAdmin(admin.ModelAdmin, ExportCsvMixin):
@@ -179,6 +185,10 @@ class ModaliteAdmin(admin.ModelAdmin, ExportCsvMixin):
 
     actions = ["export_as_csv"]
 
+# ---------------------------------------------------------------------------------------- #
+# TEST PING 
+# ---------------------------------------------------------------------------------------- #
+
     def select_addrip(modeladmin, request, queryset):
         'Does something with each objects selected '
         selected_objects = queryset.all()
@@ -218,13 +228,18 @@ class ModaliteAdmin(admin.ModelAdmin, ExportCsvMixin):
         # print("listemesgping : ", listemsgping)
         return render(request, 'imagerie/pingip.html', {'listemsgping': listemsgping } )         
 
-    select_addrip.short_description = "TESTS PING"
+    select_addrip.short_description = "PING Modalite(s)"
     select_addrip.allow_tags = True
 
     actions += ["select_addrip"]
 
+# ---------------------------------------------------------------------------------------- #
+
     # admin.site.disable_action("delete_selected")   # si l' on veut désactiver cette fonction sommme toute risquée
 
+# ---------------------------------------------------------------------------------------- #
+# TEST PING RAPIDE    attention, quelques faux positifs apparaissent! 
+# ---------------------------------------------------------------------------------------- #
 
     def select_addrip_fast(modeladmin, request, queryset):
         """
@@ -275,10 +290,169 @@ class ModaliteAdmin(admin.ModelAdmin, ExportCsvMixin):
 
         return render(request, 'imagerie/pingip.html', {'listemsgping': listemsgping } ) 
 
-    select_addrip_fast.short_description = "FAST TESTS PING"
+    select_addrip_fast.short_description = "PING FAST Modalite(s) ⚠️"
     select_addrip_fast.allow_tags = True
 
     actions += ["select_addrip_fast"]
+
+# ---------------------------------------------------------------------------------------- #
+# TEST ECHO_SCU sur le PACS DEEP UNITY   AET : EE2006194AMIP
+# ---------------------------------------------------------------------------------------- #
+        
+    def select_aet(modeladmin, request, queryset):  
+               
+        def handle_open(event):
+            """Print the remote's (host, port) when connected."""
+            msg = 'Connected with remote at {}'.format(event.address)
+            # LOGGER.info(msg)
+            # logger(msg, 'debug', 'dicom')
+            # print(msg)
+
+        def handle_accepted(event, arg1, arg2):
+            """Demonstrate the use of the optional extra parameters"""
+            # LOGGER.info("Extra args: '{}' and '{}'".format(arg1, arg2))
+            msg = f"Extra args: {arg1} and {arg2}"
+            # logger(msg, 'debug', 'dicom')
+            # print(msg)
+
+        # If a 2-tuple then only `event` parameter
+        # If a 3-tuple then the third value should be a list of objects to pass the handler
+        
+        def debug_data(event):
+            from pynetdicom.utils import pretty_bytes
+            # LOGGER.debug(f"{' DEBUG - ENCODED PDU ':=^76}")
+            # print("event.data : ", event.data)
+            slist = pretty_bytes(
+                event.data, prefix=' ', delimiter=' ', max_size=None, items_per_line=25
+            )
+            for s in slist:
+                pass
+                # print("s : ", s)
+                # LOGGER.debug(s)
+
+            # LOGGER.debug(f"{' END ENCODED PDU ':=^76}")
+        
+        def echoStatus(evt):
+            print("received {}".format(evt.event.name))
+
+
+        def echo(ip, aet, port,  AET_SCP):
+            # print(f"ip : {ip}, aet : {aet}, port : {port},  AET_SCP : {AET_SCP}")
+            #             IP_SCU      AET_SCU       PORT_SCU 
+            # le test fait un echo SCU (machines selectionnées) sur le serveur SCP
+            ae = AE(ae_title=aet)                      #  AET_SCU
+            ae.add_requested_context(Verification)     #  demende explicite d' un echo SCU
+
+            ae.acse_timeout = 3.0
+            ae.network_timeout = 4.0
+            ae.dimse_timeout = 3.0
+            result = None
+            # --------------------   TEST ECHO_SCU EN LOCAL POUR TEST   --------------------- #
+            # assoc = ae.associate("127.0.0.1", 11112, ae_title='KIG-SCP', evt_handlers=handlers)
+            
+            # ----------------   TEST ECHO_SCU SUR LE PACS CHU DEEP UNITY   ----------------- #
+            assoc = ae.associate("172.19.32.28", 11112, ae_title='EE2006194AMIP', evt_handlers=handlers)            
+
+            if assoc.is_established:
+                # print('Association established')
+                status = assoc.send_c_echo()
+
+                # Check the status of the verification request
+                if status:
+                    result = 'C-ECHO request status: 0x{0:04x}'.format(status.Status)
+                else:
+                    result = 'Connection timed out, was aborted or received invalid response'
+
+                # Release the association
+                assoc.release()
+            else:
+                result = 'Association rejected, aborted or never connected'
+                # print('Association rejected, aborted or never connected')
+
+            return result
+
+            
+        handlers = [
+            (evt.EVT_CONN_OPEN, handle_open),
+            (evt.EVT_ACCEPTED, handle_accepted, ['optional', 'parameters']),
+            (evt.EVT_ABORTED, echoStatus),
+            (evt.EVT_ESTABLISHED, echoStatus), 
+            (evt.EVT_REJECTED, echoStatus), 
+            (evt.EVT_REQUESTED, echoStatus), 
+            (evt.EVT_RELEASED, echoStatus),
+            (evt.EVT_DATA_RECV, debug_data),
+            (evt.EVT_DATA_SENT, debug_data)
+        ]
+       
+        
+        'Does something with each objects selected '
+        selected_objects = queryset.all()
+        listaet = []
+        for i in selected_objects:
+            listaet.append([i.addrip, i.aet, i.port])
+        # print("listaet : ", listaet)
+        listemsgaet = []
+        # --------------------   TEST ECHO_SCU EN LOCAL POUR TEST   --------------------- #
+        # paramètres de notre 'PACS' de test dont la Cde est ci-dessous :
+        # python -m pynetdicom echoscp 11112 -v -aet KIG-SCP
+        # IP_SCP = "127.0.0.1"
+        # PORT_SCP = 11112
+        # AET_SCP = 'KIG-SCP'
+        # ----------------   TEST ECHO_SCU SUR LE PACS CHU DEEP UNITY   ----------------- #
+        IP_SCP = "172.19.32.28"
+        PORT_SCP = 11112
+        AET_SCP = 'EE2006194AMIP'
+        
+        for modal in listaet:     
+            msgping = []
+            ip = modal[0] if modal[0] else '---'
+            aet = modal[1] if modal[1] else '---'
+            port = modal[2] if modal[2] else '---'
+            try:                
+                print(f"=-=-=-=-=-=-=-=->>>>>   echo({ip}, {aet}, {port}, {AET_SCP})")
+                res = echo(ip, aet, port,  AET_SCP)
+                # print('resultat de la commande echo : ', res)
+                # res = "test_ok"
+                if 'C-ECHO request status' in res:
+                    color = "color:#008800"
+                    # mesg = "ping dicom OK"
+                    mesg = res
+            #         messages.success(request, 'ping OK !')
+                elif 'Connection timed out' in res:
+                    color = "color:#FF0000;"
+                    # mesg = "ping dicom KO"
+                    mesg = res
+            #         messages.warning(request, 'ping KO !')
+                elif 'Association rejected' in res: 
+                    color = "color:#0000FF;"
+                    # mesg = "association rejetée"
+                    mesg = res
+            except: 
+                color = "color:#0000FF;"
+                # mesg = "problème dans la commande echo"
+                mesg = "problème dans la commande echo"
+
+            msgeip = format_html(f"<a style={color}>{ip}</a>" )
+            msgeaet = format_html(f"<a style={color}>{aet}</a>" )
+            msgeport = format_html(f"<a style={color}>{port}</a>" )
+            msgmesg = format_html(f"<a style={color}>{mesg}</a>" )
+            msgping.append(msgeip)
+            msgping.append(msgeaet)
+            msgping.append(msgeport)
+            msgping.append(msgmesg)
+            listemsgaet.append(msgping)
+            
+        # print("listemesgaet : ", listemsgaet)
+        return render(request, 'imagerie/pingdicom.html', {'listemsgaet': listemsgaet } )         
+
+    select_aet.short_description = "PING DICOM"
+    select_aet.allow_tags = True
+
+    actions += ["select_aet"]
+
+
+
+
 
 class VlanAdmin(admin.ModelAdmin, ExportCsvMixin):
     list_display = ('nom','num', 'divers')

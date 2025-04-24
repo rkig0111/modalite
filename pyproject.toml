@@ -18,6 +18,7 @@ markdown = "^3.7"
 django-filter = "^25.1"
 django-cors-headers = "^4.7.0"
 requests = "^2.32.3"
+pynetdicom = "^2.1.1"
 
 [tool.poetry.group.dev.dependencies]
 Django = "^5.1.2"
