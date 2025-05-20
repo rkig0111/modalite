@@ -6,17 +6,9 @@ from pathlib import Path
 from dicom.management.commands.echoscu import echoscu
 from pynetdicom import AE, evt, debug_logger
 from pynetdicom.sop_class import Verification
-# from modalite.settings import logger
-# import logging
+import logging
 
-# logger('Logging out to log system...', 'debug', 'modalite')
-# print("logger in ping_dicom : ", logger)
-# logger('Logging out to log dicom...', 'debug', 'dicom')
-# print("logger in ping_dicom : ", logger)
-
-# 
-# debug_logger()
-# logging.basicConfig(filename='verif_aet.log', level=logging.WARN)    # , filemode='w'
+logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
         
@@ -43,33 +35,33 @@ class Command(BaseCommand):
             """Print the remote's (host, port) when connected."""
             msg = 'Connected with remote at {}'.format(event.address)
             print("# LOGGER.info(msg)  :  ", msg)
-            # logger(msg, 'debug', 'dicom')
+            logger.info(msg)
             # logger(msg, 'debug', 'modlite')
             
         def handle_accepted(event, arg1, arg2):
             """Demonstrate the use of the optional extra parameters"""
             print("# LOGGER.info('Extra args: '{}' and '{}''.format(arg1, arg2))")
-            # logger(f"Extra args: {arg1} and {arg2}", 'debug', 'dicom')
+            # logger.info(f"Extra args: {arg1} and {arg2}")
             # logger(f"Extra args: {arg1} and {arg2}", 'debug', 'modalite')
             
         # If a 2-tuple then only `event` parameter
         # If a 3-tuple then the third value should be a list of objects to pass the handler
         handlers = [
             (evt.EVT_CONN_OPEN, handle_open),
-            (evt.EVT_ACCEPTED, handle_accepted, ['optional', 'parameters']),
+            # (evt.EVT_ACCEPTED, handle_accepted, ['optional', 'parameters']),
         ]
         # ae = AE(ae_title="IMA0209")
-        ae = AE(ae_title=f"{AET_SCU}")
+        ae = AE(ae_title=AET_SCU)
         ae.add_requested_context(Verification)
         # assoc = ae.associate("172.19.32.28", 11112, ae_title='EE2006194AMIP', evt_handlers=handlers)
         assoc = ae.associate(IP_SCP, PORT_SCP, ae_title=AET_SCP, evt_handlers=handlers) 
         
         try:
-            resp = assoc.send_c_echo()
+            resp = assoc.send_c_echo(1)
             print(f'Modality responded with status: {resp.Status}')
-            # logger(f'Modality responded with status: {resp.Status}', 'debug', 'dicom')
-            # logger(f'Modality responded with status: {resp.Status}', 'debug', 'modalite')
+            logger.info(f'Modality responded with status : {resp.Status}')
             assoc.release()
+            # recup_info()
         except Exception as e:
             assoc.release()
             raise e

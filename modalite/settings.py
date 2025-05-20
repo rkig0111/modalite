@@ -103,7 +103,7 @@ DEBUG = False
 DATABASES = {                     
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": "//shor/imagerie$/db2.sqlite3",
+        "NAME": BASE_DIR / "db2.sqlite3",
     },
     # "default": {
     #     "ENGINE": "django.db.backends.sqlite3",
@@ -173,6 +173,68 @@ INTERNAL_IPS = [
 
 MEDIA_ROOT = BASE_DIR / 'media'
 MEDIA_URL = '/media/'
+
+# logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)s %(levelname)s %(message)s', datefmt='%Y-%m-%dT%H:%M:%S')
+# 
+# class DebugOnlyFilter(logging.Filter):
+#     def filter(self, record):
+#         if record.levelno == logging.DEBUG:
+#             allow = True
+#         else:
+#             allow = False
+#         return allow
+
+
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': True,
+#     'filters': {
+#         'debug_only_filter': {
+#             '()': DebugOnlyFilter,
+#         },
+#     },
+#     'formatters': {
+#         'default': {
+#             'format': '%(asctime)s %(name)s %(levelname)s %(message)s',
+#             'datefmt': '%Y-%m-%dT%H:%M:%S',
+#         },
+#         'debug_format': {'format': '[%(asctime)s]: %(levelname)s in %(name)s at line %(lineno)s: "%(message)s"'},
+#     },
+#     'handlers': {
+#         'console': {
+#             'level': 'INFO',
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'default',
+#         },
+#         'debug_console': {
+#             'level': 'DEBUG',
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'default',
+#             # 'formatter': 'debug_format',
+#             # 'filters': ['debug_only_filter'],
+#         },
+#         'dicom': {
+#             'level': 'INFO',
+#             'class': 'logging.FileHandler',
+#             'filename': './admin.log',
+#             'formatter': 'default',
+#         },
+#     },
+#     'root': {
+#         'handlers': ['console'],
+#         'level': 'DEBUG',
+#     },
+#     'loggers': {
+#         'modalite': {
+#             'handlers': ['console', 'debug_console'],
+#             'propagate': False,
+#         },
+#         'admin': {
+#             'handlers': ['console', 'debug_console'],
+#             'propagate': False,
+#         },
+#     },
+# }
 
 
 

@@ -13,7 +13,7 @@ from django.utils.safestring import mark_safe
 from django.shortcuts import render, redirect
 from django.utils.html import format_html
 import ping3
-import logging
+# import logging
 import imagerie.adminextra as admx 
 from asyncio import run
 import csv
@@ -25,6 +25,8 @@ from pynetdicom.sop_class import Verification
 # from modalite.settings import logger
 
 # logger = logging.getLogger(__name__)
+# logger = logging.getLogger('admin')
+
 
 # class MUserAdmin(UserAdmin):
 #     fieldsets = UserAdmin.fieldsets + (
@@ -348,12 +350,13 @@ class ModaliteAdmin(admin.ModelAdmin, ExportCsvMixin):
             ae.dimse_timeout = 3.0
             result = None
             # --------------------   TEST ECHO_SCU EN LOCAL POUR TEST   --------------------- #
-            # assoc = ae.associate("127.0.0.1", 11112, ae_title='KIG-SCP', evt_handlers=handlers)
+            assoc = ae.associate("127.0.0.1", 11112, ae_title='KIG-SCP', evt_handlers=handlers)
             
             # ----------------   TEST ECHO_SCU SUR LE PACS CHU DEEP UNITY   ----------------- #
-            assoc = ae.associate("172.19.32.28", 11112, ae_title='EE2006194AMIP', evt_handlers=handlers)            
+            # assoc = ae.associate("172.19.32.28", 11112, ae_title='EE2006194AMIP', evt_handlers=handlers)            
 
             if assoc.is_established:
+                # logger.info("Association established")
                 # print('Association established')
                 status = assoc.send_c_echo()
 
@@ -393,23 +396,25 @@ class ModaliteAdmin(admin.ModelAdmin, ExportCsvMixin):
         # print("listaet : ", listaet)
         listemsgaet = []
         # --------------------   TEST ECHO_SCU EN LOCAL POUR TEST   --------------------- #
-        # paramètres de notre 'PACS' de test dont la Cde est ci-dessous :
+        # paramètres de notre 'PACS' de test dont la Cde est ci-dessous 
+        # et qu'il faut lancer dans une fenêtre de commande préalablement :
         # python -m pynetdicom echoscp 11112 -v -aet KIG-SCP
-        # IP_SCP = "127.0.0.1"
-        # PORT_SCP = 11112
-        # AET_SCP = 'KIG-SCP'
-        # ----------------   TEST ECHO_SCU SUR LE PACS CHU DEEP UNITY   ----------------- #
-        IP_SCP = "172.19.32.28"
+        IP_SCP = "127.0.0.1"
         PORT_SCP = 11112
-        AET_SCP = 'EE2006194AMIP'
+        AET_SCP = 'KIG-SCP'
+        # ----------------   TEST ECHO_SCU SUR LE PACS CHU DEEP UNITY   ----------------- #
+        # IP_SCP = "172.19.32.28"
+        # PORT_SCP = 11112
+        # AET_SCP = 'EE2006194AMIP'
         
         for modal in listaet:     
             msgping = []
             ip = modal[0] if modal[0] else '---'
-            aet = modal[1] if modal[1] else '---'
-            port = modal[2] if modal[2] else '---'
+            aet = modal[1] if modal[1] else ''
+            port = modal[2] if modal[2] else 104        # port par défaut du dicom
             try:                
                 print(f"=-=-=-=-=-=-=-=->>>>>   echo({ip}, {aet}, {port}, {AET_SCP})")
+                # logger.info(f"=-=-=-=-=-=-=-=->>>>>   echo({ip}, {aet}, {port}, {AET_SCP})")
                 res = echo(ip, aet, port,  AET_SCP)
                 # print('resultat de la commande echo : ', res)
                 # res = "test_ok"
