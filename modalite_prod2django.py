@@ -42,8 +42,8 @@ col = ['Index','Ping','Telnet','Ping Echo','Echo Modalite','Port','Adresse Ip','
 
 config = {
     "host": "127.0.0.1",
-    "user": "kligliro",
-    "password": "%LokO80%",
+    "user": "k******o",
+    "password": "%L**********",
     "database": "modalite",
 }
 
