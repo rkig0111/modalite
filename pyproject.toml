@@ -20,6 +20,7 @@ django-cors-headers = "^4.7.0"
 requests = "^2.32.3"
 pynetdicom = "^2.1.1"
 apscheduler = "^3.11.0"
+whitenoise = "^6.9.0"
 
 [tool.poetry.group.dev.dependencies]
 Django = "^5.1.2"

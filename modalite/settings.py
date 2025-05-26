@@ -51,6 +51,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     #"debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
@@ -153,11 +154,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = "static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
-STATICFILES_DIRS = (
-    (BASE_DIR / 'imagerie/static'),
-)
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / 'static'
+"""STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]"""
+
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -169,10 +175,6 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
-
-
-MEDIA_ROOT = BASE_DIR / 'media'
-MEDIA_URL = '/media/'
 
 # logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)s %(levelname)s %(message)s', datefmt='%Y-%m-%dT%H:%M:%S')
 # 
