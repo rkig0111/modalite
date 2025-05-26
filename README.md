@@ -1,6 +1,6 @@
 projet modalite
 
-au préalable, une installation de git est requise...
+au préalable, une installation de python, git et de poetry est requise...
 
 1.  créez le dossier de projets (repos_modalite par exemple) :
 
@@ -16,51 +16,66 @@ au préalable, une installation de git est requise...
 
 3.  installer l' environnement virtuel
 
-    poetry install --no-root (tiret tiret no tiret root tout collé)
+    poetry install --no-root
 
-    pour vérifier que c' est fonctionne, lancer : < python manage.py check > il ne devrait pas y avoir d' erreur !
+    on peut passer sous VSCODE et le paramétrer avec l' environnement virtuel fraichement créé pour notre application.
 
-    on peut passer sous VSCODE ou tout autre outil de développement.
-
-4.  install de la BDD et choix de celle-ci
+4.  install de la BDD et choix de celle-ci ( parametrage dans instance_settings.py )
 
     - soit on part sur une BDD vierge :
-      [ poetry shell # pour lancer l'environnement virtuel ] devient optionnel
-      python manage.py migrate # création des tables dans la BDD
-      python manage.py createsuperuser # création du superuser pour accéder à l'administration de django  
-       python manage.py runserver # lancer le serveur de développement et se connecter à http://127.0.0.1:8000/admin
 
-    - soit on va récupérer la BDD où j’ai fait une récupération du logiciel d' imagerie ( récupération rapide ):  
-       ( pour faire les tests, c’est mieux )
+    DATABASES = {
+    "default": {
+    "ENGINE": "django.db.backends.sqlite3",
+    "NAME": BASE_DIR / "db2.sqlite3",
+    }}
+
+    python manage.py migrate # création des tables dans la BDD
+
+    - soit on va récupérer la BDD où j’ai fait une récupération du logiciel d' imagerie ( récupération rapide sans tri :-( ):
 
     copy \\serveur_biomed\repertoire_partage\db2.sqlite3 . # attention, il y a un espace entre le sqlite3 et le point !
 
+    - soit on utilise la BDD réelle (production):
+
+    DATABASES = {
+    "default": {
+    "ENGINE": "django.db.backends.sqlite3",
+    "NAME": "//serveur_biomed/repertoire_partage/db2.sqlite3",
+    }}
+
+    remplacer <\\serveur_biomed> et <repertoire_partage> par leur vrai valeur !!!
+
+5.  création du superuser :
+
+    # création du superuser pour accéder à l'administration de django
+
+    python manage.py createsuperuser
+
+6.  lancement du serveur :
+
+    # lancer le serveur et se connecter à http://127.0.0.1:8000/ ( redirigé vers http://127.0.0.1:8000/admin/ )
+
+    # on peut paramétrer avec < http://127.0.0.1:8000/admin/imagerie/modalite/?reforme__exact=0 >
+
+    # pour afficher directement toute les modalités sans les réformes
+
+    python manage.py runserver
+
     y’a plus qu’à… ! :-)
 
-pour planifier le script ping_all_update.py sur son poste et pour le développement :
+-
+-
+-
+-
+- pour planifier le script ping_all_update.py sur son poste et pour le développement :
 
 décommenter dans imagerie\apps.py
-def ready(self):
-from . import updater
-print("modalite/imagerie/apps.py ( ImagerieConfig.ready )")
-updater.start()
 
-en lancant < manage.py runserver --noreload > il lance l' update automatiquement avec les valeur de la ligne du fichier < imagerie/updater.py >
+- def ready(self):
+-       from . import updater
+-       updater.start()
+
+en lancant < manage.py runserver > il lance l' update automatiquement avec les valeur de la ligne du fichier < imagerie/updater.py >
 
     scheduler.add_job(pingall, 'cron', day_of_week= 'mon-fri', hour='8,10,12,14,15,16')  # du lundi au vendredi, de 8 à 16 h00 toutes les 2 heures
-
-ne fonctionne pas, nous n' avons pas les droits adéquats !
-
-# aller dans le planificateur de tache
-
-# créer une tache.
-
-# par exemple pour moi :
-
-#
-
-# Command : C:\Users\kligliro\AppData\Local\pypoetry\Cache\virtualenvs\repos-modalite-btVqF2Tu-py3.10\Scripts\python.exe
-
-# Arguments : C:\Users\kligliro\repos_modalite\modalite\manage.py ping_all
-
-# WorkingDirectory: C:\Users\kligliro\repos_modalite\modalite
