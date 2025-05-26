@@ -15,7 +15,8 @@
     git clone https://github.com/rkig0111/modalite
 ```
 
-    aller dans le répertoire "modalite" qui vient d’ être créé. [ BASEDIR pour Django et répertoire de travail de « vscode » ]
+> aller dans le répertoire "modalite" qui vient d’ être créé.
+> [ BASEDIR pour Django et répertoire de travail de « vscode » ]
 
 ```
     cd modalite
@@ -63,11 +64,9 @@
     }}
 ```
 
-> remplacer <\\serveur_biomed> et <repertoire_partage> par leur vrai valeur !!!
+> remplacer <//serveur_biomed> et <repertoire_partage> par leur vrai valeur !!!
 
 ### 5. création du superuser :
-
-> création du superuser pour accéder à l'administration de django
 
 ```
     python manage.py createsuperuser
@@ -75,9 +74,9 @@
 
 ### 6. lancement du serveur :
 
-    lancer le serveur et se connecter à http://127.0.0.1:8000/ ( redirigé vers http://127.0.0.1:8000/admin/ )
-    on peut paramétrer avec < http://127.0.0.1:8000/admin/imagerie/modalite/?reforme__exact=0 >
-    pour afficher directement toute les modalités sans les réformes
+> lancer le serveur et se connecter à http://127.0.0.1:8000/ (redirigé vers http://127.0.0.1:8000/admin/)
+> on peut paramétrer avec < http://127.0.0.1:8000/admin/imagerie/modalite/?reforme__exact=0 >
+> pour afficher directement toutes les modalités sans les réformes
 
 ```
     python manage.py runserver
