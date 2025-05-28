@@ -37,7 +37,7 @@ class Command(BaseCommand):
                 ping = modal[0]    #  True  ou  False  
                 delai = modal[2]   #  delai de réponse du ping. non utilisé actuellement        
                 modalbdd = Modalite.objects.filter(addrip=ip)
-                for m in  modalbdd:          
+                for m in  modalbdd:        
                     if (m.ping == False) and (ping == True):
                         # print(f"---> {count} la modalité {m.addrip} répond pour la première fois au ping                                    ")  
                         m.ping = True
@@ -51,13 +51,12 @@ class Command(BaseCommand):
                         pass                    
                     elif (m.ping == False) and (ping == False) :
                         # print(f"---> {count} la modalité {m.addrip} n'a pour l'instant, jamais répondu au ping                              ")
-                        count += 1
                         pass
-
+                    count += 1
                     #m.save()
 
             modal_ON = Modalite.objects.filter(ping=True).count()
             modal_OFF = Modalite.objects.filter(ping=False).count()   
-            result.write(f"{self.horodat()} --> ON : {modal_ON}  ---  OFF : {modal_OFF} \n")
+            # result.write(f"{self.horodat()} --> ON : {modal_ON}  ---  OFF : {modal_OFF} \n")
             # print(f"{self.horodat()} --> ON : {modal_ON}  ---  OFF : {modal_OFF} \n")
 

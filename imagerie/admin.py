@@ -18,7 +18,7 @@ import imagerie.adminextra as admx
 from asyncio import run
 import csv
 import subprocess
-
+from modalite.settings import BASE_DIR, DEBUG, AET_SCP, PORT_SCP, IP_SCP 
 from pynetdicom import AE, evt, debug_logger
 from pynetdicom.sop_class import Verification
 
@@ -349,12 +349,14 @@ class ModaliteAdmin(admin.ModelAdmin, ExportCsvMixin):
             ae.network_timeout = 4.0
             ae.dimse_timeout = 3.0
             result = None
-            # --------------------   TEST ECHO_SCU EN LOCAL POUR TEST   --------------------- #
-            assoc = ae.associate("127.0.0.1", 11112, ae_title='KIG-SCP', evt_handlers=handlers)
             
-            # ----------------   TEST ECHO_SCU SUR LE PACS CHU DEEP UNITY   ----------------- #
-            # assoc = ae.associate("172.19.32.28", 11112, ae_title='EE2006194AMIP', evt_handlers=handlers)            
-
+            if DEBUG:
+                # --------------------   TEST ECHO_SCU EN LOCAL POUR TEST   --------------------- #
+                assoc = ae.associate("127.0.0.1", 11112, ae_title='KIG-SCP', evt_handlers=handlers)
+            else :
+                # ----------------   TEST ECHO_SCU SUR LE PACS CHU DEEP UNITY   ----------------- #
+                assoc = ae.associate(IP_SCP, PORT_SCP, ae_title=AET_SCP, evt_handlers=handlers)            
+            
             if assoc.is_established:
                 # logger.info("Association established")
                 # print('Association established')

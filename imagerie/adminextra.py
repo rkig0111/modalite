@@ -21,7 +21,7 @@ async def ping_host(host, taskQueue, resultsQueue, timeout, retry):
 async def ping_hosts(hosts, timeout=1, retry=False):
     # hosts = [["host1.com"], ["host2.com"], [...]]
     results: list = []
-    taskQueue: Queue = Queue(maxsize=1000)
+    taskQueue: Queue = Queue(maxsize=250)
     resultsQueue: Queue = Queue()
     for host in hosts:
         await taskQueue.put(create_task(ping_host(host[0], taskQueue, resultsQueue, timeout, retry)))

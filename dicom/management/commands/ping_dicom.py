@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from imagerie.models import Modalite
-from modalite.settings import BASE_DIR
+from modalite.settings import BASE_DIR, AET_SCP, PORT_SCP, IP_SCP 
 from django.utils import timezone
 from pathlib import Path
 from dicom.management.commands.echoscu import echoscu
@@ -19,16 +19,25 @@ class Command(BaseCommand):
     def horodat(self):
         return timezone.now().strftime('%Y/%m/%d, %H:%M:%S')
 
+    def add_arguments(self, parser):
+        parser.add_argument("aets", nargs="+", type=str)
+                      
     def handle(self, *args, **options):
-                
+        #AET_SCU = "IMA0209" 
+        print(f'AET_SCP = {AET_SCP}' )
+        print(f'PORT_SCP = {PORT_SCP}')
+        print(f'IP_SCP = {IP_SCP}')
+        for ae in options["aets"]:
+            print(f'AET_SCU = {ae}')
+                  
         '''AET_SCP = "EE2006194AMIP"
         PORT_SCP = 11112
-        IP_SCP = "172.19.32.28"'''
+        IP_SCP = "172.19.32.28"
         
         AET_SCU = "KIG-SCU"        
         AET_SCP = "KIG-SCP"
         PORT_SCP = 11112
-        IP_SCP = "127.0.0.1"
+        IP_SCP = "127.0.0.1"'''
         
               
         def handle_open(event):
@@ -50,7 +59,25 @@ class Command(BaseCommand):
             (evt.EVT_CONN_OPEN, handle_open),
             # (evt.EVT_ACCEPTED, handle_accepted, ['optional', 'parameters']),
         ]
-        # ae = AE(ae_title="IMA0209")
+        
+        for aet in options["aets"]:
+            ae = AE(ae_title=aet)       # AET_SCU
+            logger.info(f'Modality SCU ====>  [ {aet} ]  <====')
+            try:
+                ae.add_requested_context(Verification)
+                # assoc = ae.associate("172.19.32.28", 11112, ae_title='EE2006194AMIP', vt_handlers=handlers)
+                assoc = ae.associate(IP_SCP, PORT_SCP, ae_title=AET_SCP, evt_handlers=handlers) 
+                # print(assoc.is_established)
+                resp = assoc.send_c_echo(1)
+                logger.info(f'Modality responded with status : {resp.Status}')
+                assoc.release()
+                # recup_info()
+            except Exception as e:
+                logger.info(f'"Une exception est survenue pour la modalite {aet} : " : {e}')
+                # assoc.release()
+                # raise e
+
+        '''# ae = AE(ae_title="IMA0209")
         ae = AE(ae_title=AET_SCU)
         ae.add_requested_context(Verification)
         # assoc = ae.associate("172.19.32.28", 11112, ae_title='EE2006194AMIP', evt_handlers=handlers)
@@ -64,7 +91,7 @@ class Command(BaseCommand):
             # recup_info()
         except Exception as e:
             assoc.release()
-            raise e
+            raise e'''
     
  
                     

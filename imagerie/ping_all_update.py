@@ -33,7 +33,7 @@ def send_msg(data):
     s.quit()
 
 def horodat():
-    return timezone.now().strftime('%m/%d/%Y %I:%M:%S %p')
+    return timezone.now().strftime('%Y/%m/%d %H:%M:%S')
 
 def pingall():
     global boucle
@@ -80,5 +80,7 @@ def pingall():
         result.write(f"{horodat()} --> ON : {modal_ON}  ---  OFF : {modal_OFF} \n")
         data = new_modal + f"{boucle:3d} -- {horodat()}  --> ON : {modal_ON}  ---  OFF : {modal_OFF} \n"
         # print(data)
-        send_msg(data)
+        
+        if new_modal:
+            send_msg(data)
       
