@@ -18,7 +18,7 @@ import imagerie.adminextra as admx
 from asyncio import run
 import csv
 import subprocess
-from modalite.settings import BASE_DIR, DEBUG, AET_SCP, PORT_SCP, IP_SCP 
+from modalite.settings import BASE_DIR, DEBUG, DEEP_UNITY
 from pynetdicom import AE, evt, debug_logger
 from pynetdicom.sop_class import Verification
 
@@ -302,6 +302,8 @@ class ModaliteAdmin(admin.ModelAdmin, ExportCsvMixin):
 # ---------------------------------------------------------------------------------------- #
         
     def select_aet(modeladmin, request, queryset):  
+
+        AET_SCP = DEEP_UNITY[AET_SCP]
                
         def handle_open(event):
             """Print the remote's (host, port) when connected."""
