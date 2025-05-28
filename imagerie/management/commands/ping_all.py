@@ -4,6 +4,7 @@ from django.utils import timezone
 from pathlib import Path
 from modalite.settings import BASE_DIR
 
+
 class Command(BaseCommand):
     args = ''
     help = "Scanne les modalités pour noter celles qui répondent au ping et met à jour la BDD"

@@ -1,4 +1,4 @@
-from modalite.settings import BASE_DIR
+from modalite.settings import BASE_DIR, SUBJECT01, MAIL_FROM, MAIL_TO, MAIL_SRV, MAIL_SRV_PORT
 from imagerie.models import Modalite
 from django.utils import timezone
 import smtplib
@@ -23,11 +23,11 @@ def send_msg(data):
     msg = EmailMessage()
     msg.set_content(message + data)    
     
-    msg['Subject'] = 'résultat de la command ping_all_auto.py'
-    msg['From'] = "kliglich.romuald@chu-amiens.fr"
-    msg['To'] = "kliglich.romuald@chu-amiens.fr"
+    msg['Subject'] = SUBJECT01
+    msg['From'] = MAIL_FROM
+    msg['To'] = MAIL_TO
 
-    s = smtplib.SMTP('chateau-margaux',25)  # si pas d'envoi mail, demander à la DSN si autorisation accordée pour cette machine. (IP)
+    s = smtplib.SMTP(MAIL_SRV, MAIL_SRV_PORT)  # si pas d'envoi mail, demander à la DSN si autorisation accordée pour cette machine. (IP)
     s.set_debuglevel(debuglevel)
     s.send_message(msg)
     s.quit()
