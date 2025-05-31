@@ -5,6 +5,7 @@ from django.db.models import UniqueConstraint
 from datetime import timedelta
 from django.utils import timezone
 from django.utils.html import format_html
+from simple_history.models import HistoricalRecords
 
 # class MUser(AbstractUser):
 #     is_premium = models.BooleanField(default=False)
@@ -13,7 +14,8 @@ from django.utils.html import format_html
 class Appareil(models.Model):
     nom = models.CharField(max_length=45, blank=True, null=True)
     divers = models.CharField(max_length=255, blank=True, null=True)
-
+    history = HistoricalRecords()
+    
     class Meta:
         managed = True
         db_table = 'Appareil'
@@ -28,7 +30,8 @@ class Localisation(models.Model):
     # nomutil = models.CharField(blank=True, null=True, max_length=30) 
     # tel = models.CharField(blank=True, null=True, max_length=30) 
     # divers = models.CharField(max_length=255, blank=True, null=True)
-
+    history = HistoricalRecords()
+    
     class Meta:
         managed = True
         db_table = 'Localisation'
@@ -40,7 +43,8 @@ class Localisation(models.Model):
 class Marque(models.Model):
     nom = models.CharField(max_length=30, blank=True, null=True)
     divers = models.CharField(max_length=255, blank=True, null=True)
-
+    history = HistoricalRecords()
+    
     class Meta:
         managed = True
         db_table = 'Marque'
@@ -52,7 +56,8 @@ class Marque(models.Model):
 class Appareiltype(models.Model):
     nom = models.CharField(max_length=45, blank=True, null=True)
     divers = models.CharField(max_length=255, blank=True, null=True)
-
+    history = HistoricalRecords()
+    
     class Meta:
         managed = True
         db_table = 'AppareilType'
@@ -66,7 +71,8 @@ class Vlan(models.Model):
     num = models.IntegerField(unique=True, blank=True, null=True)
     nom = models.CharField(max_length=45, blank=True, null=True)
     divers = models.CharField(max_length=255, blank=True, null=True)
-
+    history = HistoricalRecords()
+    
     class Meta:
         managed = True
         db_table = 'Vlan'
@@ -80,7 +86,8 @@ class Etablissement(models.Model):
     nom = models.CharField(max_length=45, blank=True, null=True)
     # site = models.CharField(max_length=45, blank=True, null=True)
     divers = models.CharField(max_length=255, blank=True, null=True)
-
+    history = HistoricalRecords()
+    
     class Meta:
         managed = True
         db_table = 'Etablissement'
@@ -91,7 +98,8 @@ class Etablissement(models.Model):
 class Service(models.Model):
     nom = models.CharField(max_length=45, blank=True, null=True)
     divers = models.CharField(max_length=255, blank=True, null=True)
-
+    history = HistoricalRecords()
+    
     class Meta:
         managed = True
         db_table = 'Service'
@@ -106,7 +114,8 @@ class Identifiant(models.Model):
     login = models.CharField(blank=True, null=True, max_length=128) 
     #password = models.CharField(blank=True, null=True, max_length=30, default="voir TeamPass") 
     divers = models.CharField(max_length=255, blank=True, null=True)
-
+    history = HistoricalRecords()
+    
     class Meta:
         managed = True
         db_table = 'Identifiant'
@@ -126,7 +135,8 @@ class Contact(models.Model):
     telfixe = models.CharField(max_length=30, blank=True, null=True)
     dect = models.CharField(max_length=30, blank=True, null=True)
     divers = models.CharField(max_length=255, blank=True, null=True)
-
+    history = HistoricalRecords()
+    
     class Meta:
         managed = True
         db_table = 'Contact'
@@ -139,7 +149,8 @@ class Ras(models.Model):
     denom = models.CharField(blank=True, null=True, max_length=128) 
     contact = models.ForeignKey('Contact', null=True, blank=True, on_delete=models.PROTECT, related_name='ras_contact', help_text=_(" Contact "), )
     divers = models.CharField(max_length=255, blank=True, null=True)
-
+    history = HistoricalRecords()
+    
     class Meta:
         managed = True
         db_table = 'Ras'
@@ -155,7 +166,8 @@ class Resspartage(models.Model):
     identifiant = models.ManyToManyField('Identifiant', blank=True, help_text=_(" Identifiant # "), ) 
     # password = models.CharField(blank=True, null=True, max_length=30, default="voir TeamPass") 
     divers = models.CharField(max_length=255, blank=True, null=True)
-
+    history = HistoricalRecords()
+    
     class Meta:
         managed = True
         db_table = 'Resspartage'
@@ -173,7 +185,8 @@ class Bdd(models.Model):
     identifiant = models.ManyToManyField('Identifiant', blank=True, help_text=_(" Identifiant # "), )  
     # password = models.CharField(blank=True, null=True, max_length=30) 
     divers = models.CharField(max_length=255, blank=True, null=True)
-
+    history = HistoricalRecords()
+    
     class Meta:
         managed = True
         db_table = 'Bdd'
@@ -187,8 +200,16 @@ class Connection(models.Model):
     ras = models.ForeignKey('Ras', null=True, blank=True, on_delete=models.PROTECT, related_name='Connection_ras', help_text=_(" compte ras_xxx "), )
     resspartage = models.ForeignKey('Resspartage', null=True, blank=True, on_delete=models.PROTECT, related_name='Connection_resspartage', help_text=_(" ressource partagée "), )
     bdd = models.ForeignKey('Bdd', null=True, blank=True, on_delete=models.PROTECT, related_name='Connection_bdd', help_text=_(" connexion à BDD "), )
+    history = HistoricalRecords()
     
- 
+    class Meta:
+        managed = True
+        db_table = 'Connection'
+
+    def __str__(self):
+        return "{0} ".format(self.nom)  
+    
+    
 class Soft(models.Model):
     
     def one_year_from_today():
@@ -211,7 +232,8 @@ class Soft(models.Model):
     #referent = models.CharField(max_length=30, blank=True, null=True)
     # marche = models.CharField(max_length=30, blank=True, null=True)
     divers = models.CharField(max_length=255, blank=True, null=True)
-
+    history = HistoricalRecords()
+    
     class Meta:
         managed = True
         db_table = 'Logiciel'
@@ -237,7 +259,8 @@ class Hard(models.Model):
     #projet = models.ForeignKey('Projet', null=True, blank=True, on_delete=models.PROTECT, related_name='ordi_projet', help_text=_(" Projet "), )        
     doc = models.FileField(blank=True, null=True, upload_to="documentations")
     divers = models.CharField(max_length=1024, blank=True, null=True) 
-
+    history = HistoricalRecords()
+    
     class Meta:
         managed = True
         db_table = 'Hard'
@@ -260,7 +283,8 @@ class Projet(models.Model):
     datecreat = models.DateTimeField(auto_now_add=True, verbose_name='date de création')
     datemodif = models.DateTimeField(auto_now_add=True, verbose_name='date de modification')
     datefin = models.DateTimeField(auto_now_add=True, verbose_name='date de finalisation')
-
+    history = HistoricalRecords()
+    
     class Meta:
         managed = True
         db_table = 'Projet'
@@ -316,6 +340,7 @@ class Modalite(models.Model):
     ping = models.BooleanField(default=False, help_text=(" joignable par ping ? "))
     recent_ping = models.DateTimeField(null=True, blank=True)
     first_ping = models.DateTimeField(null=True, blank=True)
+    history = HistoricalRecords()
 
     class Meta:
         constraints = [

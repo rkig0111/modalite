@@ -22,6 +22,8 @@ from modalite.settings import BASE_DIR, DEBUG, DEEP_UNITY
 from pynetdicom import AE, evt, debug_logger
 from pynetdicom.sop_class import Verification
 
+from simple_history.admin import SimpleHistoryAdmin
+
 # from modalite.settings import logger
 
 # logger = logging.getLogger(__name__)
@@ -33,52 +35,52 @@ from pynetdicom.sop_class import Verification
 #         ('Extra', {'fields': ('is_premium', 'good_reputation')}),
 #     )
 
-class AppareilAdmin(admin.ModelAdmin):
+class AppareilAdmin(SimpleHistoryAdmin):
     list_display = ('nom',)
 
-class LocalisationAdmin(admin.ModelAdmin):
+class LocalisationAdmin(SimpleHistoryAdmin):
     list_display = ('code',)
 
-class MarqueAdmin(admin.ModelAdmin):
+class MarqueAdmin(SimpleHistoryAdmin):
     list_display = ('nom',)
 
-# class AppareiltypeAdmin(admin.ModelAdmin):
-#     list_display = ('nom',)
+class AppareiltypeAdmin(SimpleHistoryAdmin):
+    list_display = ('nom',)
 
-class AppareiltypeAdmin(admin.ModelAdmin):
+class AppareiltypeAdmin(SimpleHistoryAdmin):
     list_display = ( "nom",)    
 
-class EtablissementAdmin(admin.ModelAdmin):
+class EtablissementAdmin(SimpleHistoryAdmin):
     list_display = ('nom',)
 
-class ServiceAdmin(admin.ModelAdmin):
+class ServiceAdmin(SimpleHistoryAdmin):
     list_display = ('nom',)
     
-class IdentifiantAdmin(admin.ModelAdmin):
+class IdentifiantAdmin(SimpleHistoryAdmin):
     list_display = ('login',)
 
-class ContactAdmin(admin.ModelAdmin):
+class ContactAdmin(SimpleHistoryAdmin):
     list_display = ('nom',)
 
-class RasAdmin(admin.ModelAdmin):
+class RasAdmin(SimpleHistoryAdmin):
     list_display = ('denom',)
     
-class ResspartageAdmin(admin.ModelAdmin):
+class ResspartageAdmin(SimpleHistoryAdmin):
     list_display = ('nom',)
 
-class BddAdmin(admin.ModelAdmin):
+class BddAdmin(SimpleHistoryAdmin):
     list_display = ('nom',)
 
-class ConnectionAdmin(admin.ModelAdmin):
+class ConnectionAdmin(SimpleHistoryAdmin):
     list_display = ('nom',)
     
-class SoftAdmin(admin.ModelAdmin):
+class SoftAdmin(SimpleHistoryAdmin):
     list_display = ('nom',)
 
-class HardAdmin(admin.ModelAdmin):
+class HardAdmin(SimpleHistoryAdmin):
     list_display = ('description',)
      
-class ProjetAdmin(admin.ModelAdmin):
+class ProjetAdmin(SimpleHistoryAdmin):
     list_display = ('nom',)
 
 class ModaliteLine(admin.StackedInline):
@@ -131,7 +133,8 @@ class ExportCsvMixin:
     export_as_csv.short_description = "Export Selected as CSV"
     
 
-class ModaliteAdmin(admin.ModelAdmin, ExportCsvMixin):
+# class ModaliteAdmin(admin.ModelAdmin, ExportCsvMixin):
+class ModaliteAdmin(SimpleHistoryAdmin, ExportCsvMixin):
     list_select_related = ["vlan", "appareil", "appareiltype", 'pacs', 'worklist', 'service']
     # list_prefetch_related   pour les tables many to many 
     
@@ -463,7 +466,7 @@ class ModaliteAdmin(admin.ModelAdmin, ExportCsvMixin):
 
 
 
-class VlanAdmin(admin.ModelAdmin, ExportCsvMixin):
+class VlanAdmin(SimpleHistoryAdmin, ExportCsvMixin):
     list_display = ('nom','num', 'divers')
     search_fields = ('nom', 'num')
     actions = ["export_as_csv"]
@@ -491,3 +494,21 @@ admin.site.register(Hard, HardAdmin)
 admin.site.register(Projet, ProjetAdmin)
 admin.site.register(Modalite, ModaliteAdmin)
 # admin.site.register(Testlan, TestlanAdmin)
+
+"""admin.site.register(Appareil, SimpleHistoryAdmin)
+admin.site.register(Localisation, SimpleHistoryAdmin)
+admin.site.register(Marque, SimpleHistoryAdmin)
+admin.site.register(Appareiltype, SimpleHistoryAdmin)
+admin.site.register(Vlan, SimpleHistoryAdmin)
+admin.site.register(Etablissement, SimpleHistoryAdmin)
+admin.site.register(Service, SimpleHistoryAdmin)
+admin.site.register(Identifiant, SimpleHistoryAdmin)
+admin.site.register(Contact, SimpleHistoryAdmin)
+admin.site.register(Ras, SimpleHistoryAdmin)
+admin.site.register(Resspartage, SimpleHistoryAdmin)
+admin.site.register(Bdd, SimpleHistoryAdmin)
+admin.site.register(Connection, SimpleHistoryAdmin)
+admin.site.register(Soft, SimpleHistoryAdmin)
+admin.site.register(Hard, SimpleHistoryAdmin)
+admin.site.register(Projet, SimpleHistoryAdmin)
+admin.site.register(Modalite, SimpleHistoryAdmin)"""
