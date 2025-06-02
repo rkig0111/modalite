@@ -8,7 +8,8 @@ from . import views
 app_name = 'imagerie'
 
 urlpatterns = [    
-    path("", RedirectView.as_view(url='admin/') ),
+    path("", RedirectView.as_view(url='admin/imagerie/modalite/?q=&reforme__exact=0') ),
+    # path("", RedirectView.as_view(url='admin/') ),
     path("index", views.index, name='index' ),
     path("all", views.show_all_modalite , name='show_all_modalite' ),
     path("show/<int:id>/", views.show_modalite , name='show_modalite' ),
