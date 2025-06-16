@@ -135,6 +135,24 @@ class ExportCsvMixin:
 
 # class ModaliteAdmin(admin.ModelAdmin, ExportCsvMixin):
 class ModaliteAdmin(SimpleHistoryAdmin, ExportCsvMixin):
+    fieldsets = (
+        ("Dicom & network Information", {
+            "fields": [("aet", "port", "hostname", "serveur"), ("addrip", 'macaddr', "vlan"), ('mask', 'gw', 'dns1', 'dns2', 'dhcp')],
+            "classes": ["wide"],
+            "description": "Cette section concerne le paramétrage DICOM et réseau.",
+        }),
+        ("Optional Info", {
+            "fields": [('appareil', 'appareiltype'), ('n_invent', 'n_system'), ('service', 'loc'), ('reforme', 'ping', 'commentaire')],
+            "classes": ["collapse"],
+            "description": "Cette section contient les infos relatives à l' appareil.",
+        }),
+        ("Connexions DICOM", {
+            "fields": [('pacs', 'worklist'), ('stores', 'printers')],
+            "classes": ["collapse"],
+            "description": "Cette section contient des infos sur les différentes connexions DICOM liées à cette modalité.",
+        }),        
+    )
+    
     list_select_related = ["vlan", "appareil", "appareiltype", 'pacs', 'worklist', 'service']
     # list_prefetch_related   pour les tables many to many 
     
@@ -167,6 +185,21 @@ class ModaliteAdmin(SimpleHistoryAdmin, ExportCsvMixin):
         'vlan__nom',
     )
 
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == "stores":
+            kwargs["queryset"] = Modalite.objects.filter(serveur="ST")
+        if db_field.name == "printers":
+            kwargs["queryset"] = Modalite.objects.filter(serveur="PR")
+        return super(ModaliteAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+    
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "pacs":
+            kwargs["queryset"] = Modalite.objects.filter(serveur="PA")
+        if db_field.name == "worklist":
+            kwargs["queryset"] = Modalite.objects.filter(serveur="WL")
+        return super(ModaliteAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+    
+    
     """def appareiltype_link(self, obj):
         if obj.appareiltype:
             url = reverse('admin:imagerie_appareiltype_change', args=[obj.appareiltype.id])           

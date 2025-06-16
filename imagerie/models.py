@@ -307,44 +307,46 @@ class Modalite(models.Model):
     ]
     
     # nom      = models.CharField(max_length=30, blank=True, null=True) 
-    appareil = models.ForeignKey('Appareil', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_appareil',help_text=_(" Appareil ") )
-    appareiltype = models.ForeignKey('AppareilType', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_appareiltype',help_text=_(" Appareiltype ") )
+    appareil = models.ForeignKey('Appareil', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_appareil')             # ,help_text=_(" Appareil ") 
+    n_system = models.CharField(max_length=20, blank=True, null=True)                                                                       # ,help_text=_(" Numéro de système ") 
+    n_invent = models.CharField(max_length=20, blank=True, null=True)                                                                       # ,help_text=_(" Numéro d' inventaire ") 
+    appareiltype = models.ForeignKey('AppareilType', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_appareiltype') # ,help_text=_(" Appareiltype ")  
     # alias    = models.CharField(max_length=30, blank=True, null=True)   
     serveur  = models.CharField(max_length=2, null=True, blank=True, choices=SERVEURS, default="NA") 
-    hard = models.OneToOneField('Hard', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_hard', help_text=_(" configuration matérielle de la machine "))
+    hard = models.OneToOneField('Hard', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_hard')                      # , help_text=_(" configuration matérielle de la machine ")
     soft = models.ManyToManyField('Soft', blank=True, related_name='modalite_soft', help_text=_(" configuration logicielle de la machine "))
-    Connection = models.OneToOneField('Connection', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_Connection', help_text=_(" connnectivité de la machine "))
+    Connection = models.OneToOneField('Connection', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_Connection')    # , help_text=_(" connnectivité de la machine ")
     addrip = models.GenericIPAddressField(default="0.0.0.0", blank=True, null=True)
     hostname = models.CharField(max_length=30, blank=True, null=True) 
     commentaire = models.CharField(max_length=255, blank=True, null=True)
     macaddr = models.CharField(max_length=20, blank=True, null=True) 
-    vlan = models.ForeignKey('Vlan', null=True, blank=True, on_delete=models.PROTECT, related_name='net_vlan', help_text=_(" Vlan "), ) 
+    vlan = models.ForeignKey('Vlan', null=True, blank=True, on_delete=models.PROTECT, related_name='net_vlan')                              # , help_text=_(" Vlan "),  
     mask = models.CharField(max_length=20, blank=True, null=True, default='255.255.255.0')
     gw = models.GenericIPAddressField(default="0.0.0.1", blank=True, null=True)
     dns1 = models.GenericIPAddressField(default="10.200.1.10", blank=True, null=True)
     dns2 = models.GenericIPAddressField(default="172.25.16.10", blank=True, null=True)
     dhcp = models.BooleanField(default=False)
-    aet      = models.CharField(max_length=30, blank=True, null=True, help_text=_(" Aet ")) 
+    aet      = models.CharField(max_length=30, blank=True, null=True)                                                                       # , help_text=_(" Aet ")
     port     = models.IntegerField(blank=True, null=True, help_text=_(" Port DICOM ")) 
     # divers   = models.CharField(max_length=1024, blank=True, null=True) 
     # modedegrade =  models.TextField(blank=True, null=True, help_text=_(" mode dégradé à mettre en place.. "))
     # doc      = models.FileField(blank=True, null=True, upload_to="documentations")
-    pacs     = models.ForeignKey('self', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_pacs',help_text=_(" Pacs ") )  
-    worklist = models.ForeignKey('self', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_worklist',help_text=_(" Worklist ") )
-    stores    = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='modalite_stores', help_text=_(" différents STORE où l'on peut pousser les examens"))
-    printers  = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='modalite_printers', help_text=_(" différents PRINT où l'on peut imprimer les examens"))
+    pacs     = models.ForeignKey('self', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_pacs')                     # ,help_text=_(" Pacs ") 
+    worklist = models.ForeignKey('self', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_worklist')                 # ,help_text=_(" Worklist ") 
+    stores    = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='modalite_stores')                               # , help_text=_(" différents STORE où l'on peut pousser les examens")
+    printers  = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='modalite_printers')                             # , help_text=_(" différents PRINT où l'on peut imprimer les examens")
     # modalite = models.CharField(max_length=5, blank=True, null=True, help_text=_(" CT, CR, DX, US, MR, etc... ")) 
-    service  = models.ForeignKey('Service', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_service', help_text=_(" Service ") )
-    loc = models.ForeignKey('Localisation', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_loc',help_text=_(" Localisation ") )
-    reforme = models.BooleanField(default=False, help_text=(" réformé ? "))
-    ping = models.BooleanField(default=False, help_text=(" joignable par ping ? "))
+    service  = models.ForeignKey('Service', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_service')               # , help_text=_(" Service ") 
+    loc = models.ForeignKey('Localisation', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_loc')                   # ,help_text=_(" Localisation ") 
+    reforme = models.BooleanField(default=False)                                                                                            # , help_text=(" réformé ? ")
+    ping = models.BooleanField(default=False)                                                                                               # , help_text=(" joignable par ping ? ")
     recent_ping = models.DateTimeField(null=True, blank=True)
     first_ping = models.DateTimeField(null=True, blank=True)
     history = HistoricalRecords()
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['addrip', 'aet', 'port'], name='unique_dicom') # trio DICOM !
+            models.UniqueConstraint(fields=['addrip', 'aet', 'port'], name='unique_dicom')                                                   # trio DICOM !
         ]
         managed = True
         db_table = 'Modalite'
