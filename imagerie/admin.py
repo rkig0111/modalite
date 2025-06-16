@@ -170,7 +170,9 @@ class ModaliteAdmin(SimpleHistoryAdmin, ExportCsvMixin):
         'appareiltype', 
         'colored_addrip',
     )"""
-
+    
+    # admin.site.empty_value_display = "(None)"
+    
     list_per_page = 30
 
     autocomplete_fields = ('vlan',)
@@ -496,6 +498,18 @@ class ModaliteAdmin(SimpleHistoryAdmin, ExportCsvMixin):
     actions += ["select_aet"]
 
 
+# ---------------------------------------------------------------------------------------- #
+# REFORMES MULTIPLES
+# ---------------------------------------------------------------------------------------- #
+
+    def select_reforme(modeladmin, request, queryset):
+
+        queryset.update(reforme=True)
+         
+    select_reforme.short_description = "Reforme Modalite(s)"
+    select_reforme.allow_tags = True
+
+    actions += ["select_reforme"]
 
 
 
