@@ -12,7 +12,8 @@ app_name = 'modalite'
 urlpatterns = [
     path("", include('imagerie.urls') ),
     path("api-auth/", include('rest_framework.urls') ),
-    path("admin/", admin.site.urls),
+    # path("admin/", admin.site.urls),
+    path("biomed_modalite/", admin.site.urls),
     path('signup', views.signup, name="signup"),
     path('login', views.login_user, name="login"),
     path('logout', views.logout_user, name="logout"),

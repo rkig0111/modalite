@@ -7,8 +7,11 @@ from . import views
 
 app_name = 'imagerie'
 
-urlpatterns = [    
-    path("", RedirectView.as_view(url='admin/imagerie/modalite/?q=&reforme__exact=0') ),
+urlpatterns = [ 
+    # path("", RedirectView.as_view(url='admin/imagerie/modalite/') ),
+    path("", RedirectView.as_view(url='biomed_modalite/imagerie/modalite/') ), 
+    # path("", RedirectView.as_view(url='admin/imagerie/modalite/?q=&reforme__exact=0') ),
+    #path("", RedirectView.as_view(url='biomed_modalite/imagerie/modalite/?_facets=True&reforme=0') ),
     # path("", RedirectView.as_view(url='admin/') ),
     path("index", views.index, name='index' ),
     path("all", views.show_all_modalite , name='show_all_modalite' ),

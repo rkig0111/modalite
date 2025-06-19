@@ -132,13 +132,73 @@ class ExportCsvMixin:
 
     export_as_csv.short_description = "Export Selected as CSV"
     
+    
+class ReformeFilter(admin.SimpleListFilter):
+    title = _("Réformes")
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = "reforme"
+    show_facets = admin.ShowFacets.ALWAYS    # ALWAYS, NEVER
+    show_full_result_count =  True
+
+    def lookups(self, request, model_admin):
+        return [
+            ('all', _("All")), 
+            (None, 'Non réformés'), 
+            ('yes', "Réformés"),                               
+        ]
+       
+    def choices(self, cl):
+        for lookup, title in self.lookup_choices:
+            yield {
+                'selected': self.value() == lookup,
+                'query_string': cl.get_query_string({
+                    self.parameter_name: lookup,
+                }, []),
+                'display': title,
+            }
+            
+    def queryset(self, request, queryset):
+        # print('request : ', request)
+        if self.value()== 'yes':
+            return queryset.filter(reforme=True)
+        if self.value()== None:
+            return queryset.filter(reforme=False)
+        else:
+            return queryset
+
+
+"""class ReformeFilter(admin.SimpleListFilter):
+
+    title = '"Réformes"'
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = 'reforme'
+
+    def lookups(self, request, model_admin):
+        return (
+            (2, 'Toutes'),
+            (1, 'Réformés'),
+            (0, 'Non réformés'),
+        )
+
+    def queryset(self, request, queryset):
+
+        if self.value() is None:
+            self.used_parameters[self.parameter_name] = 0
+        else:
+            self.used_parameters[self.parameter_name] = int(self.value())
+        if self.value() == 2:
+            return queryset
+        return queryset.filter(reforme=self.value())"""
+    
+    
 
 # class ModaliteAdmin(admin.ModelAdmin, ExportCsvMixin):
 class ModaliteAdmin(SimpleHistoryAdmin, ExportCsvMixin):
     fieldsets = (
         ("Dicom & network Information", {
-            "fields": [("aet", "port", "hostname", "serveur"), ("addrip", 'macaddr', "vlan"), ('mask', 'gw', 'dns1', 'dns2', 'dhcp')],
-            "classes": ["wide"],
+            "fields": [('aet', 'port', 'hostname', 'serveur'), ('dhcp', 'addrip', 'macaddr', "vlan"), ('mask', 'gw', 'dns1', 'dns2')],
+            "classes": ['wide'],
             "description": "Cette section concerne le paramétrage DICOM et réseau.",
         }),
         ("Optional Info", {
@@ -148,7 +208,7 @@ class ModaliteAdmin(SimpleHistoryAdmin, ExportCsvMixin):
         }),
         ("Connexions DICOM", {
             "fields": [('pacs', 'worklist'), ('stores', 'printers')],
-            "classes": ["collapse"],
+            "classes": ['collapse'],
             "description": "Cette section contient des infos sur les différentes connexions DICOM liées à cette modalité.",
         }),        
     )
@@ -157,13 +217,12 @@ class ModaliteAdmin(SimpleHistoryAdmin, ExportCsvMixin):
     # list_prefetch_related   pour les tables many to many 
     
     # list_display = ('aet', 'hostname', 'colored_addrip', 'appareil_link', 'appareiltype_link', 'port', 'pacs', 'worklist', 'service', 'macaddr')   #  'vlan'
-    list_display = ('aet', 'hostname', 'colored_addrip', 'vlan', 'appareil', 'appareiltype', 'port', 'pacs', 'worklist', 'service', 'macaddr')
+    list_display = ( 'aet', 'hostname', 'colored_addrip', 'vlan', 'appareil', 'appareiltype', 'port', 'pacs', 'worklist', 'service', 'macaddr')
     ordering = ('addrip',)
     # list_editable = ('appareil', 'appareiltype')
-
-    # list_filter = [VlanFilterSearchForm, 'appareil']   # , 'net__vlan__nom'
-    list_filter= ['reforme', 'ping', TousLesServeursListFilter, 'vlan' ] # , 'serveur', 'vlan'  , 'appareil'
-
+    # list_filter= ['reforme', 'ping', TousLesServeursListFilter, 'vlan' ] # , 'serveur', 'vlan'  , 'appareil'    
+    list_filter = [ReformeFilter, 'ping', TousLesServeursListFilter, 'vlan' ]
+    
     """list_display_links = (
         'aet',
         'appareil',
@@ -186,7 +245,8 @@ class ModaliteAdmin(SimpleHistoryAdmin, ExportCsvMixin):
         'macaddr',
         'vlan__nom',
     )
-
+    
+    
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == "stores":
             kwargs["queryset"] = Modalite.objects.filter(serveur="ST")
@@ -274,8 +334,9 @@ class ModaliteAdmin(SimpleHistoryAdmin, ExportCsvMixin):
     actions += ["select_addrip"]
 
 # ---------------------------------------------------------------------------------------- #
-
-    # admin.site.disable_action("delete_selected")   # si l' on veut désactiver cette fonction sommme toute risquée
+# à décommenter si l' on veut désactiver cette fonction...     
+# admin.site.disable_action("delete_selected")
+# ---------------------------------------------------------------------------------------- #
 
 # ---------------------------------------------------------------------------------------- #
 # TEST PING RAPIDE    attention, quelques faux positifs apparaissent! 
