@@ -69,11 +69,11 @@ def pingip(request, ip):
     messageping = format_html("<a style=%s>%s</a>" % (color, mesg ))
     # return render(request, 'imagerie/pingip.html', {'messageping': messageping, 'ip':ip, 'messages':[messages,]} ) 
     # return redirect('admin:imagerie_modalite_show')
-    # return redirect("http://127.0.0.1:8000/admin/imagerie/modalite/")
-    return redirect('/admin/imagerie/modalite/')
+    # return redirect("http://127.0.0.1:8000/biomed_modalite/imagerie/modalite/")
+    return redirect('/biomed_modalite/imagerie/modalite/')
     # from django.utils.http import is_safe_url
-    # is_safe_url('/admin/imagerie/modalite/')
-    # print(" is_safe_url('/admin/imagerie/modalite/' : ", is_safe_url('/admin/imagerie/modalite/'))
+    # is_safe_url('/biomed_modalite/imagerie/modalite/')
+    # print(" is_safe_url('/biomed_modalite/imagerie/modalite/' : ", is_safe_url('/biomed_modalite/imagerie/modalite/'))
 
 def show_all_modalite(request):
     # modalites = Modalite.objects.prefetch_related('stores').all().order_by('id').all()

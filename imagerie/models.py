@@ -342,7 +342,8 @@ class Modalite(models.Model):
     ping = models.BooleanField(default=False)                                                                                               # , help_text=(" joignable par ping ? ")
     recent_ping = models.DateTimeField(null=True, blank=True)
     first_ping = models.DateTimeField(null=True, blank=True)
-    history = HistoricalRecords()
+    history = HistoricalRecords(excluded_fields=['recent_ping'])
+    # history = HistoricalRecords(cascade_delete_history=True)
 
     class Meta:
         constraints = [
