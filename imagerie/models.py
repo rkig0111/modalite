@@ -154,6 +154,7 @@ class Ras(models.Model):
     class Meta:
         managed = True
         db_table = 'Ras'
+        verbose_name_plural ='Comptes Ras'
 
     def __str__(self):
         return "{0} ".format(self.denom) 
@@ -171,6 +172,7 @@ class Resspartage(models.Model):
     class Meta:
         managed = True
         db_table = 'Resspartage'
+        verbose_name_plural = 'ressources partagées'
 
     def __str__(self):
         return "{0} ".format(self.chemin)  
@@ -190,6 +192,7 @@ class Bdd(models.Model):
     class Meta:
         managed = True
         db_table = 'Bdd'
+        verbose_name_plural = 'bases de données'
 
     def __str__(self):
         return "{0} ".format(self.nom)   
@@ -237,6 +240,7 @@ class Soft(models.Model):
     class Meta:
         managed = True
         db_table = 'Logiciel'
+        verbose_name_plural ='Logiciels'
 
     def __str__(self):
         return "{0} {1} ".format(self.nom, self.version)
@@ -265,6 +269,7 @@ class Hard(models.Model):
         managed = True
         db_table = 'Hard'
         ordering = ["description"]
+        verbose_name_plural ='Hardwares'
 
     def __str__(self):
         return "{0}".format(self.description)
@@ -338,11 +343,11 @@ class Modalite(models.Model):
     # modalite = models.CharField(max_length=5, blank=True, null=True, help_text=_(" CT, CR, DX, US, MR, etc... ")) 
     service  = models.ForeignKey('Service', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_service')               # , help_text=_(" Service ") 
     loc = models.ForeignKey('Localisation', null=True, blank=True, on_delete=models.PROTECT, related_name='modalite_loc')                   # ,help_text=_(" Localisation ") 
-    reforme = models.BooleanField(default=False)                                                                                            # , help_text=(" réformé ? ")
-    ping = models.BooleanField(default=False)                                                                                               # , help_text=(" joignable par ping ? ")
+    reforme = models.BooleanField(default=False)                                                                                        # , help_text=(" réformé ? ")
+    ping = models.BooleanField(default=False, blank=True)                                                                                               # , help_text=(" joignable par ping ? ")
     recent_ping = models.DateTimeField(null=True, blank=True)
     first_ping = models.DateTimeField(null=True, blank=True)
-    history = HistoricalRecords(excluded_fields=['recent_ping'])
+    history = HistoricalRecords(excluded_fields=['recent_ping'], m2m_fields=[stores, printers])
     # history = HistoricalRecords(cascade_delete_history=True)
 
     class Meta:
@@ -352,6 +357,7 @@ class Modalite(models.Model):
         managed = True
         db_table = 'Modalite'
         ordering = ["aet"]
+        verbose_name_plural = 'Modalités'
 
     def __str__(self):
         return "{0}".format(self.aet)

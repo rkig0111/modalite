@@ -1,6 +1,8 @@
 from modalite.settings import BASE_DIR, SUBJECT01, MAIL_FROM, MAIL_TO, MAIL_SRV, MAIL_SRV_PORT
 from imagerie.models import Modalite
 from django.utils import timezone
+from django.core import management
+from simple_history.management.commands import clean_duplicate_history
 import smtplib
 from email.message import EmailMessage
 import logging
@@ -35,6 +37,11 @@ def send_msg(data):
 def horodat():
     return timezone.now().strftime('%Y/%m/%d %H:%M:%S')
 
+def histo_clean_duplicate():    
+    management.call_command('clean_duplicate_history', '--auto')
+    # print(f"le nettoyage des doublons de la Base de données historique a été réalisé... ")
+    return
+    
 def pingall():
     global boucle
     boucle += 1

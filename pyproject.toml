@@ -23,9 +23,7 @@ apscheduler = "^3.11.0"
 whitenoise = "^6.9.0"
 django-simple-history = "^3.8.0"
 daphne = "^4.2.0"
-
-[tool.poetry.group.dev.dependencies]
-Django = "^5.1.2"
+django = "^5.1.2"
 
 [build-system]
 requires = ["poetry-core"]
