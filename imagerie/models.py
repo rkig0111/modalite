@@ -6,6 +6,7 @@ from datetime import timedelta
 from django.utils import timezone
 from django.utils.html import format_html
 from simple_history.models import HistoricalRecords
+from macaddress.fields import MACAddressField
 
 # class MUser(AbstractUser):
 #     is_premium = models.BooleanField(default=False)
@@ -324,7 +325,8 @@ class Modalite(models.Model):
     addrip = models.GenericIPAddressField(default="0.0.0.0", blank=True, null=True)
     hostname = models.CharField(max_length=30, blank=True, null=True) 
     commentaire = models.CharField(max_length=255, blank=True, null=True)
-    macaddr = models.CharField(max_length=20, blank=True, null=True) 
+    # macaddr = models.CharField(max_length=20, blank=True, null=True)
+    macaddr = MACAddressField(null=True, blank=True, integer=False)   
     vlan = models.ForeignKey('Vlan', null=True, blank=True, on_delete=models.PROTECT, related_name='net_vlan')                              # , help_text=_(" Vlan "),  
     mask = models.CharField(max_length=20, blank=True, null=True, default='255.255.255.0')
     gw = models.GenericIPAddressField(default="0.0.0.1", blank=True, null=True)

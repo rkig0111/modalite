@@ -175,6 +175,8 @@ INTERNAL_IPS = [
     # ...
 ]
 
+MACADDRESS_DEFAULT_DIALECT = 'netaddr.mac_unix_expanded'
+
 # logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)s %(levelname)s %(message)s', datefmt='%Y-%m-%dT%H:%M:%S')
 # 
 # class DebugOnlyFilter(logging.Filter):
