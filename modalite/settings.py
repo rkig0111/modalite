@@ -14,6 +14,7 @@ from pathlib import Path
 import json
 import logging
 import logging.config
+from import_export.formats.base_formats import XLSX
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -46,6 +47,8 @@ INSTALLED_APPS = [
     "rest_framework",
     'dicom',
     'simple_history',
+    # 'djangoql',
+    'import_export',
     #'bootstrap5',
 ]
 

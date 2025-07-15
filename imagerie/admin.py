@@ -21,8 +21,13 @@ import subprocess
 from modalite.settings import BASE_DIR, DEBUG, DEEP_UNITY
 from pynetdicom import AE, evt, debug_logger
 from pynetdicom.sop_class import Verification
-
+from import_export import resources
+# from djangoql.admin import DjangoQLSearchMixin  
+from import_export.admin import ImportExportMixin
+from import_export import fields
+from import_export.widgets import ForeignKeyWidget
 from simple_history.admin import SimpleHistoryAdmin
+# from django.contrib.contenttypes.models import ContentType
 
 # from modalite.settings import logger
 
@@ -191,10 +196,56 @@ class ReformeFilter(admin.SimpleListFilter):
             return queryset
         return queryset.filter(reforme=self.value())"""
     
+
+class ModaliteResource(resources.ModelResource):
+    """
+    déclarer ici les champs Foreignkey et ManyToMany pour pouvoir afficher leurs vlaurs dans l' export.
+    """
+    vlan = fields.Field(
+        column_name='vlan',
+        attribute='vlan',
+        widget=ForeignKeyWidget(Vlan, field='nom'))
+    appareil = fields.Field(
+        column_name='appareil',
+        attribute='appareil',
+        widget=ForeignKeyWidget(Appareil, field='nom'))
+    appareiltype = fields.Field(
+        column_name='appareiltype',
+        attribute='appareiltype',
+        widget=ForeignKeyWidget(Appareiltype, field='nom'))
+    pacs = fields.Field(
+        column_name='pacs',
+        attribute='pacs',
+        widget=ForeignKeyWidget(Modalite, field='pacs'))
+    worklist = fields.Field(
+        column_name='worklist',
+        attribute='worklist',
+        widget=ForeignKeyWidget(Modalite, field='worklist'))
+    stores = fields.Field(
+        column_name='stores',
+        attribute='stores',
+        widget=ForeignKeyWidget(Modalite, field='stores'))
+    printers = fields.Field(
+        column_name='printers',
+        attribute='printers',
+        widget=ForeignKeyWidget(Modalite, field='printers'))
+    service = fields.Field(
+        column_name='service',
+        attribute='service',
+        widget=ForeignKeyWidget(Service, field='nom'))
+    loc = fields.Field(
+        column_name='loc',
+        attribute='loc',
+        widget=ForeignKeyWidget(Localisation, field='code'))
     
+    class Meta:
+        model = Modalite
+        fields = ('aet', 'port', 'hostname', 'serveur', 'dhcp', 'addrip', 'macaddr', "vlan", 'mask', 'gw', 'dns1', 'dns2', 'appareil', 'n_system', 'n_invent', 'appareiltype', 
+                  'hard', 'soft', 'Connection', 'commentaire', 'pacs', 'worklist', 'stores', 'printers', 'service', 'loc', 'reforme', 'ping', 'recent_ping', 'first_ping')
 
 # class ModaliteAdmin(admin.ModelAdmin, ExportCsvMixin):
-class ModaliteAdmin(SimpleHistoryAdmin, ExportCsvMixin):
+# class ModaliteAdmin(SimpleHistoryAdmin, ExportCsvMixin):
+class ModaliteAdmin(ExportCsvMixin, ImportExportMixin, SimpleHistoryAdmin, admin.ModelAdmin):          # DjangoQLSearchMixin, 
     fieldsets = (
         ("Dicom & network Information", {
             "fields": [('aet', 'port', 'hostname', 'serveur'), ('dhcp', 'addrip', 'macaddr', "vlan"), ('mask', 'gw', 'dns1', 'dns2')],
@@ -246,6 +297,7 @@ class ModaliteAdmin(SimpleHistoryAdmin, ExportCsvMixin):
         'vlan__nom',
     )
     
+    resource_classes = (ModaliteResource,)
     
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == "stores":
@@ -402,7 +454,7 @@ class ModaliteAdmin(SimpleHistoryAdmin, ExportCsvMixin):
         
     def select_aet(modeladmin, request, queryset):  
 
-        AET_SCP = DEEP_UNITY[AET_SCP]
+        AET_SCP = DEEP_UNITY['AET_SCP']
                
         def handle_open(event):
             """Print the remote's (host, port) when connected."""
@@ -571,6 +623,28 @@ class ModaliteAdmin(SimpleHistoryAdmin, ExportCsvMixin):
     select_reforme.allow_tags = True
 
     actions += ["select_reforme"]
+
+
+# ---------------------------------------------------------------------------------------- #
+# TEST PAGE INTERMEDIAIRE
+# ---------------------------------------------------------------------------------------- #
+# @admin.action(description="test_page_intermediaire(s)")
+#
+#     def select_export_selected(modeladmin, request, queryset):
+#         selected = queryset.values_list("pk", flat=True)
+#         ct = ContentType.objects.get_for_model(queryset.model)
+#         return HttpResponseRedirect(
+#             "/export/?ct=%s&ids=%s"
+#             % (
+#                 ct.pk,
+#                 ",".join(str(pk) for pk in selected),ct=18&ids=145,144,140,615,614
+#             )
+#         )
+#
+#     select_export_selected.short_description = "page intermediaire(s)"
+#     select_export_selected.allow_tags = True
+#
+#     actions += ["select_export_selected"]
 
 
 
