@@ -6,8 +6,7 @@ from pathlib import Path
 from modalite.settings import BASE_DIR
 import csv
 
-fic_csv = '/home/kligliro/repos_modalite/modalite/private/recup_imagerie_last/liste_new_202510031116_imagerie.csv'
-
+fic_csv = str(BASE_DIR) + "/private/recup_imagerie_last/liste_new_202510031116_imagerie.csv"
        
 class Command(BaseCommand):
     args = ''
