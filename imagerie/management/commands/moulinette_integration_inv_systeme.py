@@ -37,7 +37,7 @@ class Command(BaseCommand):
                     # (modalite)    aet           addrip           macaddr           n_system         n_invent         commentaire
                     # (imagerie)    AET         Adresse Ip'      MacAdresse          systeme         inventaire         remarque
                     try:
-                        print(f'--> id: {row[0]:<5} aet: {row[7]:<26} addrip: {row[6]:<16} macaddr: {row[24]:<18} systeme: {row[19]:<25} inventaire: {row[27]:<25} ')
+                        #print(f'--> id: {row[0]:<5} aet: {row[7]:<26} addrip: {row[6]:<16} macaddr: {row[24]:<18} systeme: {row[19]:<25} inventaire: {row[27]:<25} ')
                         f.write(f'--> id: {row[0]:<5} aet: {row[7]:<26} addrip: {row[6]:<16} macaddr: {row[24]:<18} systeme: {row[19]:<25} inventaire: {row[27]:<25}\n')
                         modal = Modalite.objects.filter(addrip=row[6])   #  , macaddr=row[24], aet=row[7]
                         for m in modal:
@@ -45,16 +45,19 @@ class Command(BaseCommand):
                                 inventaire: {m.n_invent} comment: {m.commentaire}')
                             f.write(f'<-- id: {m.id:<5} aet: {m.aet} {" " * 18} addrip: {m.addrip:<16} macaddr: {m.macaddr} systeme: {m.n_system} \
                                 inventaire: {m.n_invent} comment: {m.commentaire}\n')
-                            """if row[19]:
+                            if row[19] and not m.n_system:
                                 m.n_system = row[19]
+                                print(f"ajout du n° de système : {row[19]} pour ma modalité avec l' ID : {m.id} \n")
                                 f.write(f'ajout du n° de système : {row[19]}\n')
-                            if row[27]:
+                            if row[27] and not m.n_invent:
                                 m.n_invent = row[27]
+                                print(f"ajout du n° d'inventaire : {row[27]} pour ma modalité avec l' ID : {m.id} \n")
                                 f.write(f"ajout du n° d'inventaire : {row[27]}\n")
-                            if row[17]:
+                            if row[17] and not m.commentaire:
                                 m.commentaire = row[17]
+                                print(f"ajout du commentaire : {row[17]} pour ma modalité avec l' ID : {m.id} \n")
                                 f.write(f'ajout du commentaire : {row[17]}\n')                            
-                        m.save() """    
+                        m.save()     
                         count += 1                  
                     except:
                         print(f'!!! id:  {row[0]:<5}  addrip:  {row[6]:<16} macaddr:  {row[24]:<18}   il y a problème avec cette modalié.')
