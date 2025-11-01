@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 # from .models import MUser
-from imagerie.models import Appareil, Marque, Appareiltype, Vlan, Etablissement, Service, Connection  # , Testlan
+from imagerie.models import Appareil, Marque, Appareiltype, Vlan, Etablissement, Service, Connection    # , Testlan
 from imagerie.models import Modalite, Localisation, Contact, Soft, Bdd, Ras, Resspartage, Identifiant, Projet, Hard
 from django.utils.translation import gettext as _
 #from django.db.models import Q
@@ -34,12 +34,6 @@ from simple_history.admin import SimpleHistoryAdmin
 # logger = logging.getLogger(__name__)
 # logger = logging.getLogger('admin')
 
-
-# class MUserAdmin(UserAdmin):
-#     fieldsets = UserAdmin.fieldsets + (
-#         ('Extra', {'fields': ('is_premium', 'good_reputation')}),
-#     )
-
 class AppareilAdmin(SimpleHistoryAdmin):
     list_display = ('nom',)
 
@@ -52,9 +46,6 @@ class MarqueAdmin(SimpleHistoryAdmin):
 class AppareiltypeAdmin(SimpleHistoryAdmin):
     list_display = ('nom',)
 
-class AppareiltypeAdmin(SimpleHistoryAdmin):
-    list_display = ( "nom",)    
-
 class EtablissementAdmin(SimpleHistoryAdmin):
     list_display = ('nom',)
 
@@ -64,11 +55,11 @@ class ServiceAdmin(SimpleHistoryAdmin):
 class IdentifiantAdmin(SimpleHistoryAdmin):
     list_display = ('login',)
 
-class ContactAdmin(SimpleHistoryAdmin):
-    list_display = ('nom',)
+# class ContactAdmin(SimpleHistoryAdmin):
+#     list_display = ('nom',)
 
 class RasAdmin(SimpleHistoryAdmin):
-    list_display = ('denom',)
+    list_display = ('societe',)
     
 class ResspartageAdmin(SimpleHistoryAdmin):
     list_display = ('nom',)
@@ -91,11 +82,11 @@ class ProjetAdmin(SimpleHistoryAdmin):
 class ModaliteLine(admin.StackedInline):
     model = Modalite
     extra = 0
-
+    
 class TousLesServeursListFilter(admin.SimpleListFilter):
     # Human-readable title which will be displayed in the
     # right admin sidebar just above the filter options.
-    title = _("tous les serveurs")
+    title = _("type de serveurs")
 
     # Parameter for the filter that will be used in the URL query.
     parameter_name = "serveur"
@@ -121,7 +112,6 @@ class TousLesServeursListFilter(admin.SimpleListFilter):
             return queryset.filter(serveur=self.value())
         else:
             return queryset
-
 
 class ExportCsvMixin:
     def export_as_csv(self, request, queryset):
@@ -172,34 +162,9 @@ class ReformeFilter(admin.SimpleListFilter):
             return queryset
 
 
-"""class ReformeFilter(admin.SimpleListFilter):
-
-    title = '"Réformes"'
-
-    # Parameter for the filter that will be used in the URL query.
-    parameter_name = 'reforme'
-
-    def lookups(self, request, model_admin):
-        return (
-            (2, 'Toutes'),
-            (1, 'Réformés'),
-            (0, 'Non réformés'),
-        )
-
-    def queryset(self, request, queryset):
-
-        if self.value() is None:
-            self.used_parameters[self.parameter_name] = 0
-        else:
-            self.used_parameters[self.parameter_name] = int(self.value())
-        if self.value() == 2:
-            return queryset
-        return queryset.filter(reforme=self.value())"""
-    
-
 class ModaliteResource(resources.ModelResource):
     """
-    déclarer ici les champs Foreignkey et ManyToMany pour pouvoir afficher leurs vlaurs dans l' export.
+    déclarer ici les champs Foreignkey et ManyToMany pour pouvoir afficher leurs valeurs dans l' export.
     """
     vlan = fields.Field(
         column_name='vlan',
@@ -268,18 +233,30 @@ class ModaliteAdmin(ExportCsvMixin, ImportExportMixin, SimpleHistoryAdmin, admin
     # list_prefetch_related   pour les tables many to many 
     
     # list_display = ('aet', 'hostname', 'colored_addrip', 'appareil_link', 'appareiltype_link', 'port', 'pacs', 'worklist', 'service', 'macaddr')   #  'vlan'
-    list_display = ( 'aet', 'hostname', 'colored_addrip', 'vlan', 'appareil', 'appareiltype', 'port', 'pacs', 'worklist', 'service', 'macaddr')
+    list_display = ('aet_', 'hostname', 'addrip_', 'vlan', 'appareil', 'appareiltype', 'port', 'pacs', 'worklist', 'service', 'macaddr', 'id')
     ordering = ('addrip',)
+    
+    def aet_(self, obj):
+         return obj.aet
+    aet_.empty_value_display = '-----'  
+    
+    #  #️⃣*️⃣ℹ️🆕✅☑️✔️❌✖️➕➖⬛🔘🔳🔲⬜◼️◻️❓👁️💬🔍🛠️💻🖥️🖨️⌨️🖱️🖲️💽💾💿📀⭕‼️⁉️❓❔❕❗👓📝
+    
     # list_editable = ('appareil', 'appareiltype')
     # list_filter= ['reforme', 'ping', TousLesServeursListFilter, 'vlan' ] # , 'serveur', 'vlan'  , 'appareil'    
     list_filter = [ReformeFilter, 'ping', TousLesServeursListFilter, 'vlan' ]
     
-    """list_display_links = (
-        'aet',
-        'appareil',
-        'appareiltype', 
-        'colored_addrip',
-    )"""
+    list_display_links = ('id', 'aet_')        #  'appareil', 'appareiltype', 'addrip_'       
+    
+    def aet_link(self, obj):
+        if obj.aet:
+            url = reverse('admin:imagerie_aet__change', args=[obj.aet.id])           
+            link = '<a href="%s">%s</a>' % (url, obj.aet.id)
+            # print("url ----> ", url)
+            return mark_safe(link)
+        return "N/A"
+    aet_link.allow_tags = True
+    aet_link.short_description = 'Aet_view'
     
     # admin.site.empty_value_display = "(None)"
     
@@ -313,28 +290,35 @@ class ModaliteAdmin(ExportCsvMixin, ImportExportMixin, SimpleHistoryAdmin, admin
             kwargs["queryset"] = Modalite.objects.filter(serveur="WL")
         return super(ModaliteAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
     
+    actions = ["export_as_csv"]
     
-    """def appareiltype_link(self, obj):
-        if obj.appareiltype:
-            url = reverse('admin:imagerie_appareiltype_change', args=[obj.appareiltype.id])           
-            link = '<a href="%s">%s</a>' % (url, obj.appareiltype.nom)
-            # print("url ----> ", url)
-            return mark_safe(link)
-        return "N/A"
 
-    appareiltype_link.short_description = 'Appareiltype'
-
-
-    def appareil_link(self, obj):
-        if obj.appareil:
-            url = reverse('admin:imagerie_appareil_change', args=[obj.appareil.id])          
-            link = '<a href="%s">%s</a>' % (url, obj.appareil.nom)
-            # print("url ----> ", url)
-            return mark_safe(link)
-        return "N/A"
-
-    appareil_link.short_description = 'Appareil'"""
-
+class ContactResource(resources.ModelResource):
+    """
+    déclarer ici les champs Foreignkey et ManyToMany pour pouvoir afficher leurs valeurs dans l' export.
+    """
+    compteras = fields.Field(
+        column_name='compteras',
+        attribute='compteras',
+        widget=ForeignKeyWidget(Ras, field='societe'))
+    
+    class Meta:
+        model = Contact
+        fields = ('compteras', 'nom', 'prenom', 'mail')
+        
+class ContactAdmin(ExportCsvMixin, ImportExportMixin, SimpleHistoryAdmin, admin.ModelAdmin):
+    list_select_related = ["compteras",]
+    list_display = ('compteras', 'nom', 'prenom', 'mail', 'telmobile', 'telfixe', 'dect', 'divers' )
+    ordering = ('nom',)
+    # list_editable = ('acces', 'contact', 'societe', 'divers')  
+    list_filter = ['compteras', ]
+    search_fields = ('nom', 'prenom', 'mail', 'telmobile' )
+    list_per_page = 30
+    
+    # admin.site.empty_value_display = "(None)"
+    
+    resource_classes = (ContactResource,)
+    
     actions = ["export_as_csv"]
 
 # ---------------------------------------------------------------------------------------- #
@@ -675,6 +659,7 @@ admin.site.register(Soft, SoftAdmin)
 admin.site.register(Hard, HardAdmin)
 admin.site.register(Projet, ProjetAdmin)
 admin.site.register(Modalite, ModaliteAdmin)
+# admin.site.register(Presta, PrestaAdmin)
 # admin.site.register(Testlan, TestlanAdmin)
 
 """admin.site.register(Appareil, SimpleHistoryAdmin)

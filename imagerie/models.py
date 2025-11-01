@@ -65,9 +65,8 @@ class Appareiltype(models.Model):
         ordering = ['nom']
 
     def __str__(self):
-        return "{0}".format(self.nom)    
-
-
+        return "{0}".format(self.nom)
+    
 class Vlan(models.Model):
     num = models.IntegerField(unique=True, blank=True, null=True)
     nom = models.CharField(max_length=45, blank=True, null=True)
@@ -108,8 +107,6 @@ class Service(models.Model):
 
     def __str__(self):
         return "{0}".format(self.nom)
-     
-  
     
 class Identifiant(models.Model):
     login = models.CharField(blank=True, null=True, max_length=128) 
@@ -123,13 +120,10 @@ class Identifiant(models.Model):
 
     def __str__(self):
         return "{0}".format(self.login)   
-       
-
-
 
 class Contact(models.Model):
-    societe =  models.CharField(blank=True, null=True, max_length=128) 
-    nom = models.CharField(blank=True, null=True, max_length=30) 
+    compteras = models.ForeignKey('Ras', null=True, blank=True, on_delete=models.PROTECT, related_name='compte_ras', )
+    nom = models.CharField(blank=True, null=True, max_length=30)
     prenom = models.CharField(max_length=30, blank=True, null=True)
     mail = models.EmailField(max_length=50, blank=True, null=True)
     telmobile = models.CharField(max_length=30, blank=True, null=True)
@@ -144,11 +138,10 @@ class Contact(models.Model):
 
     def __str__(self):
         return "{0} {1}".format(self.nom, self.prenom)
-
-
+    
 class Ras(models.Model):
-    denom = models.CharField(blank=True, null=True, max_length=128) 
-    contact = models.ForeignKey('Contact', null=True, blank=True, on_delete=models.PROTECT, related_name='ras_contact', help_text=_(" Contact "), )
+    societe = models.CharField(blank=True, null=True, max_length=128)
+    compte = models.CharField(blank=True, null=True, max_length=128)
     divers = models.CharField(max_length=255, blank=True, null=True)
     history = HistoricalRecords()
     
@@ -158,8 +151,7 @@ class Ras(models.Model):
         verbose_name_plural ='Comptes Ras'
 
     def __str__(self):
-        return "{0} ".format(self.denom) 
-
+        return "{0} ".format(self.compte) 
 
 class Resspartage(models.Model):
     nom = models.CharField(blank=True, null=True, max_length=128) 
@@ -177,8 +169,7 @@ class Resspartage(models.Model):
 
     def __str__(self):
         return "{0} ".format(self.chemin)  
-
-
+    
 class Bdd(models.Model):
     nom = models.CharField(blank=True, null=True, max_length=128) 
     unc = models.CharField(blank=True, null=True, max_length=255)
@@ -197,8 +188,7 @@ class Bdd(models.Model):
 
     def __str__(self):
         return "{0} ".format(self.nom)   
-
-
+    
 class Connection(models.Model):
     nom = models.CharField(blank=True, null=True, max_length=128) 
     ras = models.ForeignKey('Ras', null=True, blank=True, on_delete=models.PROTECT, related_name='Connection_ras', help_text=_(" compte ras_xxx "), )
@@ -211,9 +201,8 @@ class Connection(models.Model):
         db_table = 'Connection'
 
     def __str__(self):
-        return "{0} ".format(self.nom)  
-    
-    
+        return "{0} ".format(self.nom)
+
 class Soft(models.Model):
     
     def one_year_from_today():
@@ -245,8 +234,7 @@ class Soft(models.Model):
 
     def __str__(self):
         return "{0} {1} ".format(self.nom, self.version)
-
-
+    
 class Hard(models.Model):
     STYPES = [
         ("NA", 'N/A'),          # serveur Non Applicable
@@ -274,8 +262,7 @@ class Hard(models.Model):
 
     def __str__(self):
         return "{0}".format(self.description)
-
-
+    
 class Projet(models.Model):
     nom = models.CharField(blank=True, null=True, max_length=128) 
     demande = models.CharField(blank=True, null=True, max_length=50)
@@ -297,8 +284,7 @@ class Projet(models.Model):
 
     def __str__(self):
         return "{0}".format(self.nom)
-
-
+    
 class Modalite(models.Model): 
     SERVEURS = [
         ("NA", 'N/A'),      # serveur Non Applicable
@@ -364,7 +350,7 @@ class Modalite(models.Model):
     def __str__(self):
         return "{0}".format(self.aet)
 
-    def colored_addrip(self):
+    def addrip_(self):
         # url ='/admin/imagerie/modalite/{}/change/'.format(self.id)
         url ='/{}/'.format(self.addrip)
         if self.ping is False:
@@ -378,7 +364,7 @@ class Modalite(models.Model):
         # return format_html('<span style=color:%s><a href="%s</a></span>' % (color, self.addrip, self.addrip))
                                     
 
-    colored_addrip.allow_tags = True
+    addrip_.allow_tags = True
 
 # class Testlan(models.Model):
 #     modalite = models.OneToOneField(Modalite, on_delete=models.CASCADE, primary_key=True,)
